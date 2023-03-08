@@ -1,0 +1,97 @@
+syntax = "proto3";
+package service.administrator.v1;
+option go_package = "yuumi/api/service/administrator/v1;v1";
+
+import "service/administrator/v1/pb_data.proto";
+
+service RoleService {
+  rpc Create (CreateRoleRequest) returns (CreateRoleReply) {}
+  rpc Delete (DeleteRoleRequest) returns (DeleteRoleReply) {}
+  rpc Update (UpdateRoleRequest) returns (UpdateRoleReply) {}
+  rpc GetInfo (GetRoleInfoRequest) returns (GetRoleInfoReply) {}
+  rpc GetInfoWithPermissionID (GetRoleInfoWithPermissionIDRequest) returns (GetRoleInfoWithPermissionIDReply) {}
+  rpc GetList (GetRoleListRequest) returns (GetRoleListReply) {}
+  rpc GetRoles (GetRolesRequest) returns (GetRolesReply) {}
+  rpc GetRolesWithAdministratorID (GetRolesWithAdministratorIDRequest) returns (GetRolesWithAdministratorIDReply) {}
+  rpc AppendPermissionsWithRoleID(AppendPermissionsWithRoleIDRequest) returns (AppendPermissionsWithRoleIDReply) {}
+  rpc DeletePermissionsWithRoleID(DeletePermissionsWithRoleIDRequest) returns (DeletePermissionsWithRoleIDReply) {}
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  string type = 2;
+  int64 parent_id = 3;
+}
+message CreateRoleReply {
+  RoleData role = 1;
+}
+
+message DeleteRoleRequest {
+  int64 id = 1;
+}
+message DeleteRoleReply {
+  string message = 1;
+}
+
+message UpdateRoleRequest{
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+}
+message UpdateRoleReply{
+  RoleData role = 1;
+}
+
+message GetRoleInfoRequest{
+  int64 id = 1;
+  string type = 2;
+  bool preload_permissions = 50;
+}
+message GetRoleInfoReply{
+  RoleData role = 1;
+}
+
+message GetRoleInfoWithPermissionIDRequest{
+  int64 permission_id = 1;
+}
+message GetRoleInfoWithPermissionIDReply{
+  RoleData role = 1;
+}
+
+message GetRoleListRequest{
+  int64 page = 1;
+  int64 page_size = 2;
+}
+message GetRoleListReply{
+  repeated RoleData roles = 1;
+  PaginationData pagination = 2;
+}
+
+message GetRolesRequest{}
+message GetRolesReply{
+  repeated RoleData roles = 1;
+}
+
+message GetRolesWithAdministratorIDRequest{
+  int64 administrator_id = 1;
+}
+message GetRolesWithAdministratorIDReply{
+  repeated RoleData roles = 1;
+}
+
+message AppendPermissionsWithRoleIDRequest {
+  int64 role_id = 1;
+  repeated int64 permission_ids = 2;
+}
+message AppendPermissionsWithRoleIDReply {
+  string message = 1;
+}
+
+message DeletePermissionsWithRoleIDRequest {
+  int64 role_id = 1;
+  repeated int64 permission_ids = 2;
+}
+message DeletePermissionsWithRoleIDReply {
+  string message = 1;
+}

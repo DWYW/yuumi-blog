@@ -1,0 +1,123 @@
+$color: #52555a;
+$background-color: #f6f8fa;
+$border-color: #a7abb3;
+
+#markdown {
+  color: #333333;
+  line-height: 2;
+  word-wrap: break-word;
+  word-break: break-word;
+
+  img {
+    max-width: 640px;
+  }
+
+  a {
+    color: #576b95;
+    &:active {
+      color: #576b95;
+    }
+  }
+
+  blockquote {
+    margin: 20px 0;
+    padding: 0.5em 1.5em;
+
+    border-left: 4px solid $border-color;
+    background-color: $background-color;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 1em 0;
+
+    color: #000000;
+
+    font-weight: bold;
+  }
+
+  ul, ol {
+    padding-left: 30px;
+
+    li {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  ul >li {
+    list-style: disc;
+  }
+
+  ol >li {
+    list-style: decimal;
+  }
+
+  code {
+    padding: 0 4px;
+
+    color: #e94328;
+    border-radius: 4px;
+    background: #fff6f6;
+  }
+
+  details summary {
+    cursor: pointer;
+
+    outline: none;
+  }
+
+  pre code {
+    display: block;
+    overflow-x: auto;
+
+    padding: 0.5em 1.5em;
+
+    color: $color;
+    background: $background-color;
+  }
+
+  table {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    border-spacing: 0;
+
+    th {
+      font-weight: 600
+    }
+
+    td, th {
+      padding: 6px 13px;
+      border-color: transparent;
+
+      border-width: 1px;
+      border-style: solid;
+      border-top-color: $border-color;
+      border-left-color: $border-color;
+
+      &:last-child {
+        border-right-color: $border-color;
+      }
+    }
+
+    tr {
+      border-top: 1px solid $border-color;
+      background-color: #ffffff;
+
+      &:nth-child(2n) {
+        background-color: $background-color;
+      }
+    }
+
+    tbody tr:last-child {
+      td, th {
+        border-bottom-color: $border-color;
+      }
+    }
+
+    img {
+      background-color: transparent;
+    }
+  }
+}

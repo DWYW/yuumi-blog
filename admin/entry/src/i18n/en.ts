@@ -1,0 +1,3 @@
+export const SIGNIN = {
+  SLOGAN: "DO WHAT YOU WANT <br/> AND YOU ONLY LIFE ONCE 222"
+}

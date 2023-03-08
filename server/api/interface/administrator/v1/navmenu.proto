@@ -1,0 +1,137 @@
+syntax = "proto3";
+package interface.administrator.v1;
+option go_package = "yuumi/api/interface/administrator/v1;v1";
+
+import "google/api/annotations.proto";
+import "service/administrator/v1/pb_data.proto";
+
+service NavMenuInterface {
+  rpc Create (CreateNavMenuRequest) returns (CreateNavMenuReply) {
+    option (google.api.http) = {
+      post: "/navmenu",
+      body: "*"
+    };
+  }
+
+  rpc Delete (DeleteNavMenuRequest) returns (DeleteNavMenuReply) {
+    option (google.api.http) = {
+      delete: "/navmenu/{id}",
+      body: "*"
+    };
+  }
+
+  rpc Update (UpdateNavMenuRequest) returns (UpdateNavMenuReply) {
+    option (google.api.http) = {
+      put: "/navmenu/{id}",
+      body: "*"
+    };
+  }
+
+  rpc GetInfo (GetNavMenuInfoRequest) returns (GetNavMenuInfoReply) {
+    option (google.api.http) = {
+      get: "/navmenu/{id}"
+    };
+  }
+
+  rpc GetNavMenus (GetNavMenusRequest) returns (GetNavMenusReply) {
+    option (google.api.http) = {
+      get: "/navmenus"
+    };
+  }
+
+  rpc BindWithRoleIDs (NavMenuBindWithRoleIDsRequest) returns (NavMenuBindWithRoleIDsReply) {
+    option (google.api.http) = {
+      post: "/navmenu/{id}/roles/bind",
+      body: "*"
+    };
+  }
+
+  rpc UnbindWithRoleIDs (NavMenuUnbindWithRoleIDsRequest) returns (NavMenuUnbindWithRoleIDsReply) {
+    option (google.api.http) = {
+      post: "/navmenu/{id}/roles/unbind",
+      body: "*"
+    };
+  }
+
+  rpc GetNavMenusWithAdministratorID (GetNavMenusWithAdministratorIDRequest) returns (GetNavMenusWithAdministratorIDReply) {
+    option (google.api.http) = {
+      get: "/navmenus/with-administrator/{id}"
+    };
+  }
+
+  rpc GetNavMenusWithMine (GetNavMenusWithMineRequest) returns (GetNavMenusWithMineReply) {
+    option (google.api.http) = {
+      get: "/navmenus/mine"
+    };
+  }
+}
+
+message CreateNavMenuRequest {
+  string name = 1;
+  optional string link_url = 2;
+  optional string actived_rule = 3;
+  optional int64 weight = 4;
+  optional string icon = 5;
+  optional int64 parent_id = 6;
+}
+message CreateNavMenuReply {
+  service.administrator.v1.NavMenuData menu = 1;
+}
+
+message DeleteNavMenuRequest {
+  int64 id = 1;
+}
+message DeleteNavMenuReply {
+  string message = 1;
+}
+
+message UpdateNavMenuRequest {
+  int64 id = 1;
+  string name = 2;
+  optional string link_url = 3;
+  optional string actived_rule = 4;
+  optional int64 weight = 5;
+  optional string icon = 6;
+  optional int64 parent_id = 7;
+}
+message UpdateNavMenuReply {
+  service.administrator.v1.NavMenuData menu = 1;
+}
+
+message GetNavMenuInfoRequest {
+  int64 id = 1;
+}
+message GetNavMenuInfoReply {
+  service.administrator.v1.NavMenuData menu = 1;
+}
+
+message GetNavMenusRequest {
+  optional bool preload_roles = 50;
+}
+message GetNavMenusReply {
+  repeated service.administrator.v1.NavMenuData menus = 1;
+}
+
+message NavMenuBindWithRoleIDsRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message NavMenuBindWithRoleIDsReply {}
+
+message NavMenuUnbindWithRoleIDsRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message NavMenuUnbindWithRoleIDsReply {}
+
+message GetNavMenusWithAdministratorIDRequest {
+  int64 id = 1;
+}
+message GetNavMenusWithAdministratorIDReply {
+  repeated service.administrator.v1.NavMenuData menus = 1;
+}
+
+message GetNavMenusWithMineRequest{}
+message GetNavMenusWithMineReply{
+  repeated service.administrator.v1.NavMenuData menus = 1;
+}

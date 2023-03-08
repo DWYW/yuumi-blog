@@ -1,0 +1,60 @@
+syntax = "proto3";
+package service.article.v1;
+option go_package = "yuumi/api/service/article/v1;v1";
+
+import "service/article/v1/pb_data.proto";
+
+service ArticleService {
+  rpc Create (CreateArticleRequest) returns (CreateArticleReply) {}
+  rpc Delete (DeleteArticleRequest) returns (DeleteArticleReply) {}
+  rpc Update (UpdateArticleRequest) returns (UpdateArticleReply) {}
+  rpc GetInfo (GetArticleInfoRequest) returns (GetArticleInfoReply) {}
+  rpc GetList (GetArticleListRequest) returns (GetArticleListReply) {}
+}
+
+message CreateArticleRequest {
+  string title = 1;
+  string description = 2;
+  string keyword = 5;
+  string content = 3;
+  string cover_url = 4;
+}
+message CreateArticleReply {
+  ArticleData article = 1;
+}
+
+message DeleteArticleRequest {
+  int64 id = 1;
+}
+message DeleteArticleReply {
+  string message = 1;
+}
+
+message UpdateArticleRequest {
+  int64 id = 1;
+  optional string title = 2;
+  optional string description = 3;
+  optional string keyword = 4;
+  optional string content = 5;
+  optional string cover_url = 6;
+}
+message UpdateArticleReply {
+  ArticleData article = 1;
+}
+
+message GetArticleInfoRequest {
+  optional int64 id = 1;
+}
+message GetArticleInfoReply {
+  ArticleData article = 1;
+}
+
+message GetArticleListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  optional string keywrod = 3;
+}
+message GetArticleListReply {
+  repeated ArticleData articles = 1;
+  PaginationData pagination = 2;
+}

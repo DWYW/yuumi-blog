@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^12.2.3",
+    "nuxt": "^3.2.2",
+    "sass": "^1.58.3"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.4.7",
+    "highlight.js": "^11.7.0",
+    "markdown-it": "^13.0.1",
+    "pinia": "^2.0.32"
+  }
+}

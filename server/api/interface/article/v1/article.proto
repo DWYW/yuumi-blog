@@ -1,0 +1,84 @@
+syntax = "proto3";
+package interface.article.v1;
+option go_package = "yuumi/api/interface/article/v1;v1";
+
+import "service/article/v1/pb_data.proto";
+import "google/api/annotations.proto";
+
+service ArticleInterface {
+  rpc Create (CreateArticleRequest) returns (CreateArticleReply) {
+    option (google.api.http) = {
+      post: "/article",
+      body: "*"
+    };
+  }
+  rpc Delete (DeleteArticleRequest) returns (DeleteArticleReply) {
+    option (google.api.http) = {
+      delete: "/article/{id}",
+      body: "*"
+    };
+  }
+  rpc Update (UpdateArticleRequest) returns (UpdateArticleReply) {
+    option (google.api.http) = {
+      put: "/article/{id}",
+      body: "*"
+    };
+  }
+  rpc GetInfo (GetArticleInfoRequest) returns (GetArticleInfoReply) {
+    option (google.api.http) = {
+      get: "/article/{id}"
+    };
+  }
+  rpc GetList (GetArticleListRequest) returns (GetArticleListReply) {
+    option (google.api.http) = {
+      get: "/articles/list"
+    };
+  }
+}
+
+message CreateArticleRequest {
+  string title = 1;
+  string description = 2;
+  string keyword = 5;
+  string content = 3;
+  string cover_url = 4;
+}
+message CreateArticleReply {
+  service.article.v1.ArticleData article = 1;
+}
+
+message DeleteArticleRequest {
+  int64 id = 1;
+}
+message DeleteArticleReply {
+  string message = 1;
+}
+
+message UpdateArticleRequest {
+  int64 id = 1;
+  optional string title = 2;
+  optional string description = 3;
+  optional string keyword = 4;
+  optional string content = 5;
+  optional string cover_url = 6;
+}
+message UpdateArticleReply {
+  service.article.v1.ArticleData article = 1;
+}
+
+message GetArticleInfoRequest {
+  int64 id = 1;
+}
+message GetArticleInfoReply {
+  service.article.v1.ArticleData article = 1;
+}
+
+message GetArticleListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  optional string keyword = 3;
+}
+message GetArticleListReply {
+  repeated service.article.v1.ArticleData articles = 1;
+  service.article.v1.PaginationData pagination = 2;
+}

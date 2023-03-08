@@ -1,0 +1,82 @@
+syntax = "proto3";
+package service.administrator.v1;
+option go_package = "yuumi/api/service/administrator/v1;v1";
+
+import "service/administrator/v1/pb_data.proto";
+
+service NavMenuService {
+  rpc Create (CreateNavMenuRequest) returns (CreateNavMenuReply) {}
+  rpc Delete (DeleteNavMenuRequest) returns (DeleteNavMenuReply) {}
+  rpc Update (UpdateNavMenuRequest) returns (UpdateNavMenuReply) {}
+  rpc GetInfo (GetNavMenuInfoRequest) returns (GetNavMenuInfoReply) {}
+  rpc GetNavMenus (GetNavMenusRequest) returns (GetNavMenusReply) {}
+  rpc BindWithRoleIDs (NavMenuBindWithRoleIDsRequest) returns (NavMenuBindWithRoleIDsReply) {}
+  rpc UnbindWithRoleIDs (NavMenuUnbindWithRoleIDsRequest) returns (NavMenuUnbindWithRoleIDsReply) {}
+  rpc GetNavMenusWithAdministratorID (GetNavMenusWithAdministratorIDRequest) returns (GetNavMenusWithAdministratorIDReply) {}
+}
+
+message CreateNavMenuRequest {
+  string name = 1;
+  optional string link_url = 2;
+  optional string actived_rule = 3;
+  optional int64 weight = 4;
+  optional string icon = 5;
+  optional int64 parent_id = 6;
+}
+message CreateNavMenuReply {
+  NavMenuData menu = 1;
+}
+
+message DeleteNavMenuRequest {
+  int64 id = 1;
+}
+message DeleteNavMenuReply {
+  string message = 1;
+}
+
+message UpdateNavMenuRequest {
+  int64 id = 1;
+  string name = 2;
+  optional string link_url = 3;
+  optional string actived_rule = 4;
+  optional int64 weight = 5;
+  optional string icon = 6;
+  optional int64 parent_id = 7;
+}
+message UpdateNavMenuReply {
+  NavMenuData menu = 1;
+}
+
+message GetNavMenuInfoRequest {
+  int64 id = 1;
+  string name = 2;
+}
+message GetNavMenuInfoReply {
+  NavMenuData menu = 1;
+}
+
+message GetNavMenusRequest {
+  optional bool preload_roles = 50;
+}
+message GetNavMenusReply {
+  repeated NavMenuData menus = 1;
+}
+
+message NavMenuBindWithRoleIDsRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message NavMenuBindWithRoleIDsReply {}
+
+message NavMenuUnbindWithRoleIDsRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message NavMenuUnbindWithRoleIDsReply {}
+
+message GetNavMenusWithAdministratorIDRequest {
+  int64 administrator_id = 1;
+}
+message GetNavMenusWithAdministratorIDReply {
+  repeated NavMenuData menus = 1;
+}

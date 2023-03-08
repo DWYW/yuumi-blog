@@ -1,0 +1,61 @@
+syntax = "proto3";
+package service.article.v1;
+option go_package = "yuumi/api/service/article/v1;v1";
+
+import "service/article/v1/pb_data.proto";
+
+service VisitorService {
+  rpc CreateWithGithubUser (CreateWithGithubUserRequest) returns (CreateWithGithubUserReply) {}
+  rpc UpdateWithGithubUser (UpdateWithGithubUserRequest) returns (UpdateWithGithubUserReply) {}
+  rpc Delete (DeleteVisitorRequest) returns (DeleteVisitorReply) {}
+  rpc GetInfo (GetVisitorInfoRequest) returns (GetVisitorInfoReply) {}
+  rpc GetList (GetVisitorListRequest) returns (GetVisitorListReply) {}
+  rpc GetVisitorWithGithubID (GetVisitorWithGithubIDRequest) returns (GetVisitorWithGithubIDReply) {}
+}
+
+
+message CreateWithGithubUserRequest {
+  GithubUser github_user = 1;
+}
+message CreateWithGithubUserReply {
+  VisitorData visitor = 1;
+}
+
+message UpdateWithGithubUserRequest {
+  int64 id = 1;
+  GithubUser github_user = 2;
+}
+message UpdateWithGithubUserReply {
+  VisitorData visitor = 1;
+}
+
+message DeleteVisitorRequest {
+  int64 id = 1;
+}
+message DeleteVisitorReply {
+  string message = 1;
+}
+
+message GetVisitorInfoRequest {
+  optional int64 id = 1;
+}
+message GetVisitorInfoReply {
+  VisitorData visitor = 1;
+}
+
+message GetVisitorListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  optional string keywrod = 3;
+}
+message GetVisitorListReply {
+  repeated VisitorData visitors = 1;
+  PaginationData pagination = 2;
+}
+
+message GetVisitorWithGithubIDRequest {
+  int64 github_id = 1;
+}
+message GetVisitorWithGithubIDReply {
+  VisitorData visitor = 1;
+}

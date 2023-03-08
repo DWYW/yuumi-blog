@@ -1,0 +1,49 @@
+server:
+  http:
+    host: 127.0.0.1
+    port: 9005
+    cors:
+      enabled: true
+      # (localhost(:\d+)?)|(www\.github\.com)
+      white_list_regexp: (localhost(:\d+)?)
+  grpc:
+    host: 127.0.0.1
+    port: 9006
+
+log:
+  # 输出文件夹
+  dir: log/interface/passport
+  # 每小时分割一次
+  rotation_hour: 1
+  # 日志保留天数
+  max_age_day: 30
+
+time:
+  location: Asia/Shanghai
+
+service:
+  administrator:
+    host: 127.0.0.1
+    port: 9002
+  article:
+    host: 127.0.0.1
+    port: 9004
+
+jwt:
+  administrator:
+    key: signed_key
+    # 有效时间(秒)
+    iv: 86400
+  visitor:
+    key: signed_key
+    # 有效时间(秒)
+    iv: 86400
+  visitor_session:
+    key: signed_key
+    # 有效时间(秒)
+    iv: 3600
+
+# https://github.com/settings/developers
+github:
+  client_id: client_id
+  client_secret: client_secret

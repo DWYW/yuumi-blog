@@ -1,0 +1,24 @@
+.clearfix {
+  &::before, &::after {
+    content: ' ';
+    height: 0;
+    width: 0;
+    display: table;
+  }
+
+  &::after {
+    clear: both;
+  }
+}
+
+.align_left {
+  text-align: left;
+}
+
+.align_center {
+  text-align: center;
+}
+
+.align_right {
+  text-align: right;
+}

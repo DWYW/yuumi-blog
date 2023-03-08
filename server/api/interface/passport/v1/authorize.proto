@@ -1,0 +1,40 @@
+syntax = "proto3";
+package interface.passport.v1;
+option go_package = "yuumi/api/interface/passport/v1;v1";
+
+import "google/api/annotations.proto";
+import "service/administrator/v1/pb_data.proto";
+import "service/article/v1/pb_data.proto";
+
+service AuthorizeInterface {
+  rpc AdministratorWithPassword (AdministratorWithPasswordAuthorizeRequest) returns (AdministratorWithPasswordAuthorizeReply) {
+    option (google.api.http) = {
+      post: "/authorize/administrator/password",
+      body:"*"
+    };
+  }
+
+  rpc VisitorWithGithubSession (VisitorWithGithubSessionAuthorizeRequest) returns (VisitorWithGithubSessionAuthorizeReply) {
+    option (google.api.http) = {
+      post: "/authorize/visitor/github-session",
+      body:"*"
+    };
+  }
+}
+
+message AdministratorWithPasswordAuthorizeRequest {
+  string name = 1;
+  string password = 2;
+}
+message AdministratorWithPasswordAuthorizeReply {
+  string token = 1;
+  service.administrator.v1.AdministratorData administrator = 2;
+}
+
+message VisitorWithGithubSessionAuthorizeRequest {
+  string session = 1;
+}
+message VisitorWithGithubSessionAuthorizeReply {
+  string token = 1;
+  service.article.v1.VisitorData visitor = 2;
+}

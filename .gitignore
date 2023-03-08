@@ -1,0 +1,19 @@
+dist
+.DS_Store
+.nuxt
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Custom directories and files
+**/*/api/**/*.go
+**/*/bin
+**/*/log
+**/*/test
+**/*/node_modules

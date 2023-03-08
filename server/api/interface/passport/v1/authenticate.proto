@@ -1,0 +1,35 @@
+syntax = "proto3";
+package interface.passport.v1;
+option go_package = "yuumi/api/interface/passport/v1;v1";
+
+import "google/api/annotations.proto";
+
+service AuthenticateInterface {
+  rpc AdministratorWithJWT (AdministratorWithJWTAuthenticateRequest) returns (AdministratorWithJWTAuthenticateReply) {
+    option (google.api.http) = {
+      get: "/authenticate/administrator/jwt"
+    };
+  }
+
+  rpc VisitorWithJWT (VisitorWithJWTAuthenticateRequest) returns (VisitorWithJWTAuthenticateReply) {
+    option (google.api.http) = {
+      get: "/authenticate/visitor/jwt"
+    };
+  }
+}
+
+message AdministratorWithJWTAuthenticateRequest {
+  string method = 2;
+}
+message AdministratorWithJWTAuthenticateReply {
+  int64 id = 1;
+  string name = 2;
+}
+
+message VisitorWithJWTAuthenticateRequest {
+  string method = 2;
+}
+message VisitorWithJWTAuthenticateReply {
+  int64 id = 1;
+  string name = 2;
+}

@@ -1,0 +1,60 @@
+syntax = "proto3";
+package service.article.v1;
+option go_package = "yuumi/api/service/article/v1;v1";
+
+message PaginationData {
+  int64 page = 1;
+  int64 total = 2;
+  int64 page_size = 3 [json_name = "page_size"];
+  int64 page_total = 4 [json_name = "page_total"];
+}
+
+message ArticleData {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string keyword = 4;
+  string content = 5;
+  string cover_url = 6 [json_name = "cover_url"];
+  string created_at = 50 [json_name = "created_at"];
+  string updated_at = 51 [json_name = "updated_at"];
+}
+
+message GithubUser {
+  int64 github_id = 1 [json_name = "github_id"];
+  string name = 2;
+  string avatar_url = 3 [json_name = "avatar_url"];
+  string blog = 4;
+  string html_url = 5 [json_name = "html_url"];
+}
+
+message GithubUserData {
+  int64 id = 1;
+  string name = 2;
+  string avatar_url = 3 [json_name = "avatar_url"];
+  string blog = 4;
+  string html_url = 5 [json_name = "html_url"];
+  int64 visitor_id = 6 [json_name = "visitor_id"];
+  string created_at = 50 [json_name = "created_at"];
+  string updated_at = 51 [json_name = "updated_at"];
+}
+
+message VisitorData {
+  int64 id = 1;
+  string name = 2;
+  string avatar_url = 3 [json_name = "avatar_url"];
+  GithubUserData github_user = 49;
+  string created_at = 50 [json_name = "created_at"];
+  string updated_at = 51 [json_name = "updated_at"];
+}
+
+message CommentData {
+  int64 id = 1;
+  string content = 2;
+  int64 creator_id = 3 [json_name = "creator_id"];
+  int64 article_id = 4 [json_name = "article_id"];
+  VisitorData creator = 5;
+  ArticleData article = 6;
+  string created_at = 50 [json_name = "created_at"];
+  string updated_at = 51 [json_name = "updated_at"];
+}
