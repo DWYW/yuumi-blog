@@ -1,0 +1,43 @@
+syntax = "proto3";
+package interface.article.v1;
+option go_package = "yuumi/api/interface/article/v1;v1";
+
+import "service/article/v1/pb_data.proto";
+import "google/api/annotations.proto";
+
+service CommentInterface {
+  rpc Create (CreateCommentRequest) returns (CreateCommentReply) {
+    option (google.api.http) = {
+      post: "/comment",
+      body: "*"
+    };
+  }
+  rpc GetList (GetCommentListRequest) returns (GetCommentListReply) {
+    option (google.api.http) = {
+      get: "/comments/list"
+    };
+  }
+}
+
+
+message CreateCommentRequest {
+  string content = 1;
+  int64 creator_id = 2;
+  int64 article_id = 3;
+}
+message CreateCommentReply {
+  service.article.v1.CommentData comment = 1;
+}
+
+message GetCommentListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  int64 article_id = 3;
+  int64 creator_id = 4;
+  bool preload_creator = 51;
+  bool preload_article = 52;
+}
+message GetCommentListReply {
+  repeated service.article.v1.CommentData comments = 1;
+  service.article.v1.PaginationData pagination = 2;
+}

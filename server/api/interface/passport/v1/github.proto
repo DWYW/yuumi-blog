@@ -1,0 +1,21 @@
+syntax = "proto3";
+package interface.passport.v1;
+option go_package = "yuumi/api/interface/passport/v1;v1";
+
+import "google/api/annotations.proto";
+
+service GithubInterface {
+  rpc GetSessionWithGithubCode (GetSessionWithGithubCodeRequest) returns (GetSessionWithGithubCodeReply) {
+    option (google.api.http) = {
+      get: "/github/session/with-code"
+    };
+  }
+}
+
+message GetSessionWithGithubCodeRequest {
+  string code = 1;
+  string redirect = 2;
+}
+message GetSessionWithGithubCodeReply {
+  string session = 1;
+}

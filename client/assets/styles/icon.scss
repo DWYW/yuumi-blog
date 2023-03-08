@@ -1,0 +1,28 @@
+@font-face {
+  font-family: "icon"; /* Project id  */
+  src: url('../fonts/iconfont.ttf?t=1676795436957') format('truetype');
+}
+
+.icon {
+  font-family: "icon" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-github:before {
+  content: "\e602";
+}
+
+.icon-comment:before {
+  content: "\e612";
+}
+
+.icon-search:before {
+  content: "\e601";
+}
+
+.icon-publish:before {
+  content: "\e706";
+}
+

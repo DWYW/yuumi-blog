@@ -1,0 +1,48 @@
+$--color: (
+  "primary": #0d6efd,
+  "success": #00b450,
+  "error": #dc3545,
+  "warn": #ffc107,
+  "white": #ffffff
+);
+
+.yuumi-message {
+  position: absolute;
+
+  .message-panel {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    z-index: 9999;
+    transform: translate3d(-50%, 0, 0);
+    padding: 6px 16px;
+    border-radius: 4px;
+    color: #515767;
+    border: 1px solid transparent;
+
+    &.theme__default {
+      border-color: #e5e5e5;
+      background-color: #ffffff;
+    }
+
+    @each $key in ("primary", "warn", "success", "error") {
+      &.theme__#{$key} {
+        @if $key != "warn" {
+          color: map-get($--color, $key);
+        }
+        background-color: mix(map-get($--color, $key), map-get($--color, "white"), 15%);
+        border-color: mix(map-get($--color, $key), map-get($--color, "white"), 45%);
+      }
+    }
+  }
+}
+
+
+.yuumi-message-enter-active, .yuumi-message-leave-active {
+  transition: transform 0.3s, opacity 0.3s !important;
+}
+
+.yuumi-message-enter-from, .yuumi-message-leave-to {
+  transform: translate3d(-50%, -100%, 0) !important;
+  opacity: 0;
+}

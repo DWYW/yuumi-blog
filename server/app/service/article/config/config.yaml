@@ -1,0 +1,38 @@
+server:
+  http:
+    host: 127.0.0.1
+    port: 9003
+    cors:
+      enabled: true
+      # (localhost(:\d+)?)|(www\.github\.com)
+      white_list_regexp: (localhost(:\d+)?)
+  grpc:
+    host: 127.0.0.1
+    port: 9004
+
+log:
+  # 输出文件夹
+  dir: log/service/article
+  # 每小时分割一次
+  rotation_hour: 1
+  # 日志保留天数
+  max_age_day: 30
+
+time:
+  location: Asia/Shanghai
+
+pagination:
+  page_size: 20
+
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  username: root
+  password: root123456
+  dbname: article
+  charset: utf8mb4
+  pool:
+    max_idle_conns: 10
+    max_open_conns: 100
+    # 单位（h）
+    max_lifetime: 1

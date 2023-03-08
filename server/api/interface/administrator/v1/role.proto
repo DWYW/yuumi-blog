@@ -1,0 +1,130 @@
+syntax = "proto3";
+package interface.administrator.v1;
+option go_package = "yuumi/api/interface/administrator/v1;v1";
+
+import "google/api/annotations.proto";
+import "service/administrator/v1/pb_data.proto";
+
+service RoleInterface {
+  rpc Create (CreateRoleRequest) returns (CreateRoleReply) {
+    option (google.api.http) = {
+      post: "/role",
+      body: "*"
+    };
+  }
+  rpc Delete (DeleteRoleRequest) returns (DeleteRoleReply) {
+    option (google.api.http) = {
+      delete: "/role/{id}",
+      body: "*"
+    };
+  }
+  rpc Update (UpdateRoleRequest) returns (UpdateRoleReply) {
+    option (google.api.http) = {
+      put: "/role/{id}",
+      body: "*"
+    };
+  }
+  rpc GetInfo (GetRoleInfoRequest) returns (GetRoleInfoReply) {
+    option (google.api.http) = {
+      get: "/role/{id}"
+    };
+  }
+  rpc GetList (GetRoleListRequest) returns (GetRoleListReply) {
+    option (google.api.http) = {
+      get: "/roles/list"
+    };
+  }
+  rpc GetRoles (GetRolesRequest) returns (GetRolesReply) {
+    option (google.api.http) = {
+      get: "/roles"
+    };
+  }
+  rpc GetRolesWithAdministratorID (GetRolesWithAdministratorIDRequest) returns (GetRolesWithAdministratorIDReply) {
+    option (google.api.http) = {
+      get: "/roles/administrator/{administrator_id}"
+    };
+  }
+  rpc AppendPermissionsWithRoleID(AppendPermissionsWithRoleIDRequest) returns (AppendPermissionsWithRoleIDReply) {
+    option (google.api.http) = {
+      post: "/role/{id}/permissions/append",
+      body: "*"
+    };
+  }
+  rpc DeletePermissionsWithRoleID(DeletePermissionsWithRoleIDRequest) returns (DeletePermissionsWithRoleIDReply) {
+    option (google.api.http) = {
+      post: "/role/{id}/permissions/delete",
+      body: "*"
+    };
+  }
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  string type = 2;
+  int64 parent_id = 3;
+}
+message CreateRoleReply {
+  service.administrator.v1.RoleData role = 1;
+}
+
+message DeleteRoleRequest {
+  int64 id = 1;
+}
+message DeleteRoleReply {
+  string message = 1;
+}
+
+message UpdateRoleRequest{
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+}
+message UpdateRoleReply{
+  service.administrator.v1.RoleData role = 1;
+}
+
+message GetRoleInfoRequest{
+  int64 id = 1;
+  bool preload_permissions = 50;
+}
+message GetRoleInfoReply{
+  service.administrator.v1.RoleData role = 1;
+}
+
+message GetRoleListRequest{
+  int64 page = 1;
+  int64 page_size = 2;
+}
+message GetRoleListReply{
+  repeated service.administrator.v1.RoleData roles = 1;
+  service.administrator.v1.PaginationData pagination = 2;
+}
+
+message GetRolesRequest{}
+message GetRolesReply{
+  repeated service.administrator.v1.RoleData roles = 1;
+}
+
+message GetRolesWithAdministratorIDRequest{
+  int64 administrator_id = 1;
+}
+message GetRolesWithAdministratorIDReply{
+  repeated service.administrator.v1.RoleData roles = 1;
+}
+
+message AppendPermissionsWithRoleIDRequest {
+  int64 id = 1;
+  repeated int64 permission_ids = 2;
+}
+message AppendPermissionsWithRoleIDReply {
+  string message = 1;
+}
+
+message DeletePermissionsWithRoleIDRequest {
+  int64 id = 1;
+  repeated int64 permission_ids = 2;
+}
+message DeletePermissionsWithRoleIDReply {
+  string message = 1;
+}

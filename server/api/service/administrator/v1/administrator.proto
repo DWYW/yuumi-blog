@@ -1,0 +1,99 @@
+syntax = "proto3";
+package service.administrator.v1;
+option go_package = "yuumi/api/service/administrator/v1;v1";
+
+import "service/administrator/v1/pb_data.proto";
+
+service AdministratorService {
+  rpc Create (CreateAdministratorRequest) returns (CreateAdministratorReply) {}
+  rpc Delete (DeleteAdministratorRequest) returns (DeleteAdministratorReply) {}
+  rpc UpdateName (UpdateAdministratorNameRequest) returns (UpdateAdministratorNameReply) {}
+  rpc UpdatePassword (UpdateAdministratorPasswordRequest) returns (UpdateAdministratorPasswordReply) {}
+  rpc GetInfo (GetAdministratorInfoRequest) returns (GetAdministratorInfoReply) {}
+  rpc GetList (GetAdministratorListRequest) returns (GetAdministratorListReply) {}
+  rpc GetAdministrators (GetAdministratorsRequest) returns (GetAdministratorsReply) {}
+  rpc GetAdministratorWithNameAndPassword (GetAdministratorWithNameAndPasswordRequest) returns (GetAdministratorWithNameAndPasswordReply) {}
+  rpc AppendRolesWithAdministratorID (AppendRolesWithAdministratorIDRequest) returns (AppendRolesWithAdministratorIDReply) {}
+  rpc DeleteRolesWithAdministratorID (DeleteRolesWithAdministratorIDRequest) returns (DeleteRolesWithAdministratorIDReply) {}
+}
+
+message CreateAdministratorRequest {
+  string name = 1;
+  string password = 2;
+}
+message CreateAdministratorReply {
+  AdministratorData administrator = 1;
+}
+
+message DeleteAdministratorRequest {
+  int64 id = 1;
+}
+message DeleteAdministratorReply {
+  string message = 1;
+}
+
+message UpdateAdministratorNameRequest {
+  int64 id = 1;
+  string name = 2;
+}
+message UpdateAdministratorNameReply {
+  AdministratorData administrator = 1;
+}
+
+message UpdateAdministratorPasswordRequest {
+  int64 id = 1;
+  string password = 2;
+  string password_new = 3;
+}
+message UpdateAdministratorPasswordReply {
+  AdministratorData administrator = 1;
+}
+
+message GetAdministratorInfoRequest {
+  int64 id = 1;
+  bool preload_roles = 50;
+}
+message GetAdministratorInfoReply {
+  AdministratorData administrator = 1;
+}
+
+message GetAdministratorListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  bool preload_roles = 50;
+}
+message GetAdministratorListReply {
+  repeated AdministratorData administrators = 1;
+  PaginationData pagination = 2;
+}
+
+message GetAdministratorsRequest {
+  bool preload_roles = 50;
+}
+message GetAdministratorsReply {
+  repeated AdministratorData administrators = 1;
+}
+
+message GetAdministratorWithNameAndPasswordRequest {
+  string name = 1;
+  string password = 2;
+}
+message GetAdministratorWithNameAndPasswordReply {
+  AdministratorData administrator = 1;
+}
+
+message AppendRolesWithAdministratorIDRequest {
+  int64 administrator_id = 1;
+  repeated int64 role_ids = 2;
+}
+message AppendRolesWithAdministratorIDReply {
+  string message = 1;
+}
+
+message DeleteRolesWithAdministratorIDRequest {
+  int64 administrator_id = 1;
+  repeated int64 role_ids = 2;
+}
+message DeleteRolesWithAdministratorIDReply {
+  string message = 1;
+}

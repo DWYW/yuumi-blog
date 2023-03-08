@@ -1,0 +1,30 @@
+server:
+  http:
+    host: 127.0.0.1
+    port: 9009
+    cors:
+      enabled: true
+      # (localhost(:\d+)?)|(www\.github\.com)
+      white_list_regexp: (localhost(:\d+)?)
+  grpc:
+    host: 127.0.0.1
+    port: 9010
+
+log:
+  # 输出文件夹
+  dir: log/interface/administrator
+  # 每小时分割一次
+  rotation_hour: 1
+  # 日志保留天数
+  max_age_day: 30
+
+time:
+  location: Asia/Shanghai
+
+service:
+  passport:
+    host: 127.0.0.1
+    port: 9006
+  administrator:
+    host: 127.0.0.1
+    port: 9002

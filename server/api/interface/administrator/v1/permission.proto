@@ -1,0 +1,66 @@
+syntax = "proto3";
+package interface.administrator.v1;
+option go_package = "yuumi/api/interface/administrator/v1;v1";
+
+import "google/api/annotations.proto";
+import "service/administrator/v1/pb_data.proto";
+
+service PermissionInterface {
+  rpc Create (CreatePermissionRequest) returns (CreatePermissionReply) {
+    option (google.api.http) = {
+      post: "/permission",
+      body: "*"
+    };
+  }
+  rpc Delete (DeletePermissionRequest) returns (DeletePermissionReply) {
+    option (google.api.http) = {
+      delete: "/permission/{id}",
+      body: "*"
+    };
+  }
+  rpc Update (UpdatePermissionRequest) returns (UpdatePermissionReply) {
+    option (google.api.http) = {
+      put: "/permission/{id}",
+      body: "*"
+    };
+  }
+  rpc GetList (GetPermissionListRequest) returns (GetPermissionListReply) {
+    option (google.api.http) = {
+      get: "/permissions/list"
+    };
+  }
+}
+
+message CreatePermissionRequest {
+  string name = 1;
+  string rpc_method = 2;
+}
+message CreatePermissionReply {
+  service.administrator.v1.PermissionData permission = 1;
+}
+
+message DeletePermissionRequest {
+  int64 id = 1;
+}
+message DeletePermissionReply {
+  string Message = 1;
+}
+
+message UpdatePermissionRequest {
+  int64 id = 1;
+  optional string name = 2;
+  optional string rpc_method = 3;
+}
+message UpdatePermissionReply {
+  service.administrator.v1.PermissionData permission = 1;
+}
+
+message GetPermissionListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  optional bool preload_roles = 50;
+}
+message GetPermissionListReply {
+  repeated service.administrator.v1.PermissionData permissions = 1;
+  service.administrator.v1.PaginationData pagination = 2;
+}

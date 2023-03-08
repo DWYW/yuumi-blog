@@ -1,0 +1,122 @@
+syntax = "proto3";
+package interface.administrator.v1;
+option go_package = "yuumi/api/interface/administrator/v1;v1";
+
+import "google/api/annotations.proto";
+import "service/administrator/v1/pb_data.proto";
+
+service AdministratorInterface {
+  rpc Create (CreateAdministratorRequest) returns (CreateAdministratorReply) {
+    option (google.api.http) = {
+      post: "/administrator",
+      body: "*"
+    };
+  }
+  rpc Delete (DeleteAdministratorRequest) returns (DeleteAdministratorReply) {
+    option (google.api.http) = {
+      delete: "/administrator/{id}",
+      body: "*"
+    };
+  }
+  rpc UpdateName (UpdateAdministratorNameRequest) returns (UpdateAdministratorNameReply) {
+    option (google.api.http) = {
+      put: "/administrator/{id}/name",
+      body: "*"
+    };
+  }
+  rpc UpdatePassword (UpdateAdministratorPasswordRequest) returns (UpdateAdministratorPasswordReply) {
+    option (google.api.http) = {
+      put: "/administrator/{id}/password",
+      body: "*"
+    };
+  }
+  rpc GetInfo (GetAdministratorInfoRequest) returns (GetAdministratorInfoReply) {
+    option (google.api.http) = {
+      get: "/administrator/{id}"
+    };
+  }
+  rpc GetList (GetAdministratorListRequest) returns (GetAdministratorListReply) {
+    option (google.api.http) = {
+      get: "/administrators/list"
+    };
+  }
+  rpc AppendRolesWithAdministratorID(AppendRolesWithAdministratorIDRequest) returns (AppendRolesWithAdministratorIDReply) {
+    option (google.api.http) = {
+      post: "/administrator/{id}/roles/append",
+      body: "*"
+    };
+  }
+  rpc DeleteRolesWithAdministratorID(DeleteRolesWithAdministratorIDRequest) returns (DeleteRolesWithAdministratorIDReply) {
+    option (google.api.http) = {
+      post: "/administrator/{id}/roles/delete",
+      body: "*"
+    };
+  }
+}
+
+message CreateAdministratorRequest {
+  string name = 1;
+  string password = 2;
+}
+message CreateAdministratorReply {
+  service.administrator.v1.AdministratorData administrator = 1;
+}
+
+message DeleteAdministratorRequest {
+  int64 id = 1;
+}
+message DeleteAdministratorReply {
+  string message = 1;
+}
+
+message UpdateAdministratorNameRequest {
+  int64 id = 1;
+  string name = 2;
+}
+message UpdateAdministratorNameReply {
+  service.administrator.v1.AdministratorData administrator = 1;
+}
+
+message UpdateAdministratorPasswordRequest {
+  int64 id = 1;
+  string password = 2;
+  string password_new = 3;
+}
+message UpdateAdministratorPasswordReply {
+  service.administrator.v1.AdministratorData administrator = 1;
+}
+
+
+message GetAdministratorInfoRequest {
+  int64 id = 1;
+  bool preload_roles = 50;
+}
+message GetAdministratorInfoReply {
+  service.administrator.v1.AdministratorData administrator = 1;
+}
+
+message GetAdministratorListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  bool preload_roles = 50;
+}
+message GetAdministratorListReply {
+  repeated service.administrator.v1.AdministratorData administrators = 1;
+  service.administrator.v1.PaginationData pagination = 2;
+}
+
+message AppendRolesWithAdministratorIDRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message AppendRolesWithAdministratorIDReply {
+  string message = 1;
+}
+
+message DeleteRolesWithAdministratorIDRequest {
+  int64 id = 1;
+  repeated int64 role_ids = 2;
+}
+message DeleteRolesWithAdministratorIDReply {
+  string message = 1;
+}
