@@ -2,9 +2,6 @@ package navmenu
 
 import (
 	v1 "yuumi/api/service/administrator/v1"
-	"yuumi/app/service/administrator/internal/data/mysql"
-	"yuumi/app/service/administrator/internal/data/mysql/navmenu"
-	"yuumi/app/service/administrator/internal/data/mysql/role"
 	"yuumi/pkg/logger"
 
 	grpcTransport "github.com/go-kit/kit/transport/grpc"
@@ -13,11 +10,8 @@ import (
 
 // 注册服务
 func RegisterServer(s *grpc.Server, log *logger.Logger) {
-	client := mysql.GetClient()
 	service := Service{
-		Logger:       log,
-		NavMenuModel: navmenu.New(client),
-		RoleModel:    role.New(client),
+		Logger: log,
 	}
 	server := Server{}
 	v1.RegisterNavMenuServiceServer(s, &server)

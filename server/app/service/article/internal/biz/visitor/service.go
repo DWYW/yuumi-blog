@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	v1 "yuumi/api/service/article/v1"
+	"yuumi/app/service/article/internal/data/mysql"
 	"yuumi/app/service/article/internal/data/mysql/schema"
 	"yuumi/app/service/article/internal/data/mysql/transform"
 	"yuumi/app/service/article/internal/data/mysql/visitor"
@@ -24,12 +25,11 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger       *logger.Logger
-	VisitorModel *visitor.Model
+	Logger *logger.Logger
 }
 
 func (s Service) CreateWithGithubUser(ctx context.Context, in *v1.CreateWithGithubUserRequest) (*v1.CreateWithGithubUserReply, error) {
-	res, err := s.VisitorModel.CreateOne(ctx, &schema.Visitor{
+	res, err := mysql.GetVisitor().CreateOne(ctx, &schema.Visitor{
 		Name:      in.GithubUser.Name,
 		AvatarUrl: in.GithubUser.AvatarUrl,
 		GithubUser: schema.GithubUser{
@@ -49,16 +49,16 @@ func (s Service) CreateWithGithubUser(ctx context.Context, in *v1.CreateWithGith
 }
 
 func (s Service) UpdateWithGithubUser(ctx context.Context, in *v1.UpdateWithGithubUserRequest) (*v1.UpdateWithGithubUserReply, error) {
-	visitorFeilds := schema.Visitor{}.GetFeilds()
-	userFeilds := schema.GithubUser{}.GetFeilds()
-	res, err := s.VisitorModel.UpdateWithIDAndUpdateGithubUser(ctx, in.Id, map[string]interface{}{
-		visitorFeilds.Name:      in.GithubUser.Name,
-		visitorFeilds.AvatarUrl: in.GithubUser.AvatarUrl,
+	visitorFields := schema.Visitor{}.GetFields()
+	userFields := schema.GithubUser{}.GetFields()
+	res, err := mysql.GetVisitor().UpdateWithIDAndUpdateGithubUser(ctx, in.Id, map[string]interface{}{
+		visitorFields.Name:      in.GithubUser.Name,
+		visitorFields.AvatarUrl: in.GithubUser.AvatarUrl,
 	}, map[string]interface{}{
-		userFeilds.Name:      in.GithubUser.Name,
-		userFeilds.AvatarUrl: in.GithubUser.AvatarUrl,
-		userFeilds.Blog:      in.GithubUser.Blog,
-		userFeilds.HtmlUrl:   in.GithubUser.HtmlUrl,
+		userFields.Name:      in.GithubUser.Name,
+		userFields.AvatarUrl: in.GithubUser.AvatarUrl,
+		userFields.Blog:      in.GithubUser.Blog,
+		userFields.HtmlUrl:   in.GithubUser.HtmlUrl,
 	})
 
 	if err != nil {
@@ -69,7 +69,7 @@ func (s Service) UpdateWithGithubUser(ctx context.Context, in *v1.UpdateWithGith
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeleteVisitorRequest) (*v1.DeleteVisitorReply, error) {
-	_, err := s.VisitorModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetVisitor().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordDeletionFailed, err)
 	}
@@ -77,7 +77,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeleteVisitorRequest) (*v1.D
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetVisitorInfoRequest) (*v1.GetVisitorInfoReply, error) {
-	res, err := s.VisitorModel.FindByID(ctx, *in.Id)
+	res, err := mysql.GetVisitor().FindByID(ctx, *in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
 	}
@@ -85,17 +85,20 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetVisitorInfoRequest) (*v1
 }
 
 func (s Service) GetList(ctx context.Context, in *v1.GetVisitorListRequest) (*v1.GetVisitorListReply, error) {
-	findCondition := &visitor.FindCondition{Sort: &visitor.FindConditionSort{ID: -1}}
+	findCondition := &visitor.FindCondition{
+		Where: &visitor.FindConditionWhere{},
+		Sort:  &visitor.FindConditionSort{ID: -1},
+	}
 	if in.Keywrod != nil {
-		findCondition.Keyword = *in.Keywrod
+		findCondition.Where.Keyword = *in.Keywrod
 	}
 
-	total, err := s.VisitorModel.Count(ctx, findCondition, true)
+	total, err := mysql.GetVisitor().Count(ctx, findCondition.Where, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordCountFailed, err)
 	}
 
-	result, err := s.VisitorModel.FindList(ctx, &visitor.FindListCondition{
+	result, err := mysql.GetVisitor().FindList(ctx, &visitor.FindListCondition{
 		Page:          in.Page,
 		PageSize:      in.PageSize,
 		FindCondition: findCondition,
@@ -116,7 +119,7 @@ func (s Service) GetList(ctx context.Context, in *v1.GetVisitorListRequest) (*v1
 }
 
 func (s Service) GetVisitorWithGithubID(ctx context.Context, in *v1.GetVisitorWithGithubIDRequest) (*v1.GetVisitorWithGithubIDReply, error) {
-	res, err := s.VisitorModel.FindOneWithGithubID(ctx, in.GithubId)
+	res, err := mysql.GetVisitor().FindOneWithGithubID(ctx, in.GithubId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &v1.GetVisitorWithGithubIDReply{}, nil

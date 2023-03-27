@@ -15,6 +15,10 @@ type NavMenuFields struct {
 	Icon        string
 }
 
+type NavMenuRelations struct {
+	Roles string
+}
+
 type NavMenu struct {
 	gorm.Model
 	ParentID    uint
@@ -26,7 +30,11 @@ type NavMenu struct {
 	Roles       []*Role `gorm:"many2many:role_nav_menus;"`
 }
 
-func (NavMenu) GetFeilds() *NavMenuFields {
+func (NavMenu) TableName() string {
+	return "nav_menus"
+}
+
+func (NavMenu) GetFields() *NavMenuFields {
 	return &NavMenuFields{
 		ID:          "id",
 		CreatedAt:   "created_at",
@@ -38,5 +46,11 @@ func (NavMenu) GetFeilds() *NavMenuFields {
 		ActivedRule: "actived_rule",
 		Weight:      "weight",
 		Icon:        "icon",
+	}
+}
+
+func (NavMenu) GetRelations() *NavMenuRelations {
+	return &NavMenuRelations{
+		Roles: "Roles",
 	}
 }

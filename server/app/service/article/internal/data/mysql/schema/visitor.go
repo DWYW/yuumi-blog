@@ -11,6 +11,10 @@ type VisitorFields struct {
 	AvatarUrl string
 }
 
+type VisitorRelations struct {
+	GithubUser string
+}
+
 type Visitor struct {
 	gorm.Model
 	Name       string
@@ -18,7 +22,11 @@ type Visitor struct {
 	GithubUser GithubUser
 }
 
-func (Visitor) GetFeilds() *VisitorFields {
+func (Visitor) TableName() string {
+	return "visitors"
+}
+
+func (Visitor) GetFields() *VisitorFields {
 	return &VisitorFields{
 		ID:        "id",
 		CreatedAt: "created_at",
@@ -26,5 +34,11 @@ func (Visitor) GetFeilds() *VisitorFields {
 		DeletedAt: "deleted_at",
 		Name:      "name",
 		AvatarUrl: "avatar_url",
+	}
+}
+
+func (Visitor) GetRelations() *VisitorRelations {
+	return &VisitorRelations{
+		GithubUser: "GithubUser",
 	}
 }

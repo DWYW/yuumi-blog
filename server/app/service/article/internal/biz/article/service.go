@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	v1 "yuumi/api/service/article/v1"
+	"yuumi/app/service/article/internal/data/mysql"
 	"yuumi/app/service/article/internal/data/mysql/article"
 	"yuumi/app/service/article/internal/data/mysql/schema"
 	"yuumi/app/service/article/internal/data/mysql/transform"
@@ -20,12 +21,11 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger       *logger.Logger
-	ArticleModel *article.Model
+	Logger *logger.Logger
 }
 
 func (s Service) Create(ctx context.Context, in *v1.CreateArticleRequest) (*v1.CreateArticleReply, error) {
-	res, err := s.ArticleModel.CreateOne(ctx, &schema.Article{
+	res, err := mysql.GetArticle().CreateOne(ctx, &schema.Article{
 		Title:       in.Title,
 		Description: in.Description,
 		Keyword:     in.Keyword,
@@ -41,7 +41,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateArticleRequest) (*v1.C
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeleteArticleRequest) (*v1.DeleteArticleReply, error) {
-	_, err := s.ArticleModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetArticle().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordDeletionFailed, err)
 	}
@@ -49,7 +49,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeleteArticleRequest) (*v1.D
 }
 
 func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.UpdateArticleReply, error) {
-	fields := schema.Article{}.GetFeilds()
+	fields := schema.Article{}.GetFields()
 	target := map[string]interface{}{}
 	if in.Title != nil {
 		target[fields.Title] = in.Title
@@ -67,7 +67,7 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.U
 		target[fields.Content] = in.Content
 	}
 
-	res, err := s.ArticleModel.UpdateWithID(ctx, in.Id, target)
+	res, err := mysql.GetArticle().UpdateWithID(ctx, in.Id, target)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordUpdateFailed)
 	}
@@ -76,7 +76,7 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.U
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetArticleInfoRequest) (*v1.GetArticleInfoReply, error) {
-	res, err := s.ArticleModel.FindByID(ctx, *in.Id)
+	res, err := mysql.GetArticle().FindByID(ctx, *in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
 	}
@@ -84,17 +84,20 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetArticleInfoRequest) (*v1
 }
 
 func (s Service) GetList(ctx context.Context, in *v1.GetArticleListRequest) (*v1.GetArticleListReply, error) {
-	findCondition := &article.FindCondition{Sort: &article.FindConditionSort{ID: -1}}
+	findCondition := &article.FindCondition{
+		Where: &article.FindConditionWhere{},
+		Sort:  &article.FindConditionSort{ID: -1},
+	}
 	if in.Keywrod != nil {
-		findCondition.Keyword = *in.Keywrod
+		findCondition.Where.Keyword = *in.Keywrod
 	}
 
-	total, err := s.ArticleModel.Count(ctx, findCondition, true)
+	total, err := mysql.GetArticle().Count(ctx, findCondition.Where, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordCountFailed, err)
 	}
 
-	result, err := s.ArticleModel.FindList(ctx, &article.FindListCondition{
+	result, err := mysql.GetArticle().FindList(ctx, &article.FindListCondition{
 		Page:          in.Page,
 		PageSize:      in.PageSize,
 		FindCondition: findCondition,

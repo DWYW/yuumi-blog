@@ -12,6 +12,12 @@ type RoleFields struct {
 	ParentID  string
 }
 
+type RoleRelations struct {
+	Administrators string
+	Permissions    string
+	NavMenus       string
+}
+
 type Role struct {
 	gorm.Model
 	ParentID       uint
@@ -22,7 +28,11 @@ type Role struct {
 	NavMenus       []*NavMenu       `gorm:"many2many:role_nav_menus;"`
 }
 
-func (Role) GetFeilds() *RoleFields {
+func (Role) TableName() string {
+	return "roles"
+}
+
+func (Role) GetFields() *RoleFields {
 	return &RoleFields{
 		ID:        "id",
 		CreatedAt: "created_at",
@@ -31,5 +41,13 @@ func (Role) GetFeilds() *RoleFields {
 		Name:      "name",
 		Type:      "type",
 		ParentID:  "parent_id",
+	}
+}
+
+func (Role) GetRelations() *RoleRelations {
+	return &RoleRelations{
+		Administrators: "Administrators",
+		Permissions:    "Permissions",
+		NavMenus:       "NavMenus",
 	}
 }

@@ -7,17 +7,20 @@ import (
 )
 
 func New(db *gorm.DB) *Model {
+	v := schema.NavMenu{}
 	return &Model{
 		client:    db,
-		TableName: "nav_menu",
-		Feilds:    schema.NavMenu{}.GetFeilds(),
+		TableName: v.TableName(),
+		Fields:    v.GetFields(),
+		Relations: v.GetRelations(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.NavMenuFields
+	Fields    *schema.NavMenuFields
+	Relations *schema.NavMenuRelations
 }
 
 func (m Model) GetDB() *gorm.DB {

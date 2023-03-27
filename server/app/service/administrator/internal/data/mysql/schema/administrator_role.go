@@ -10,7 +10,11 @@ type AdministratorRole struct {
 	RoleID          uint
 }
 
-func (AdministratorRole) GetFeilds() *AdministratorRoleFields {
+func (AdministratorRole) TableName() string {
+	return "administrator_roles"
+}
+
+func (AdministratorRole) GetFields() *AdministratorRoleFields {
 	return &AdministratorRoleFields{
 		AdministratorID: "administrator_id",
 		RoleID:          "role_id",

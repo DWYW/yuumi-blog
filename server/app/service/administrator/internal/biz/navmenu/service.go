@@ -3,6 +3,7 @@ package navmenu
 import (
 	"context"
 	v1 "yuumi/api/service/administrator/v1"
+	"yuumi/app/service/administrator/internal/data/mysql"
 	"yuumi/app/service/administrator/internal/data/mysql/navmenu"
 	"yuumi/app/service/administrator/internal/data/mysql/role"
 	"yuumi/app/service/administrator/internal/data/mysql/schema"
@@ -23,9 +24,7 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger       *logger.Logger
-	NavMenuModel *navmenu.Model
-	RoleModel    *role.Model
+	Logger *logger.Logger
 }
 
 func (s Service) Create(ctx context.Context, in *v1.CreateNavMenuRequest) (*v1.CreateNavMenuReply, error) {
@@ -46,7 +45,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateNavMenuRequest) (*v1.C
 		v.ParentID = uint(*in.ParentId)
 	}
 
-	res, err := s.NavMenuModel.CreateOne(ctx, &v)
+	res, err := mysql.GetNavmenu().CreateOne(ctx, &v)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordCreationFailed)
 	}
@@ -55,7 +54,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateNavMenuRequest) (*v1.C
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeleteNavMenuRequest) (*v1.DeleteNavMenuReply, error) {
-	_, err := s.NavMenuModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetNavmenu().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordDeletionFailed)
 	}
@@ -64,7 +63,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeleteNavMenuRequest) (*v1.D
 }
 
 func (s Service) Update(ctx context.Context, in *v1.UpdateNavMenuRequest) (*v1.UpdateNavMenuReply, error) {
-	fields := schema.NavMenu{}.GetFeilds()
+	fields := schema.NavMenu{}.GetFields()
 	target := map[string]interface{}{}
 	if in.Name != "" {
 		target[fields.Name] = in.Name
@@ -85,7 +84,7 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateNavMenuRequest) (*v1.U
 		target[fields.Weight] = in.Weight
 	}
 
-	res, err := s.NavMenuModel.UpdateWithID(ctx, in.Id, target)
+	res, err := mysql.GetNavmenu().UpdateWithID(ctx, in.Id, target)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordUpdateFailed)
 	}
@@ -94,9 +93,11 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateNavMenuRequest) (*v1.U
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetNavMenuInfoRequest) (*v1.GetNavMenuInfoReply, error) {
-	res, err := s.NavMenuModel.FindOne(ctx, &navmenu.FindCondition{
-		ID:   in.Id,
-		Name: in.Name,
+	res, err := mysql.GetNavmenu().FindOne(ctx, &navmenu.FindCondition{
+		Where: &navmenu.FindConditionWhere{
+			ID:   in.Id,
+			Name: in.Name,
+		},
 	})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
@@ -106,7 +107,7 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetNavMenuInfoRequest) (*v1
 }
 
 func (s Service) GetNavMenus(ctx context.Context, in *v1.GetNavMenusRequest) (*v1.GetNavMenusReply, error) {
-	res, err := s.NavMenuModel.Find(ctx, &navmenu.FindCondition{
+	res, err := mysql.GetNavmenu().Find(ctx, &navmenu.FindCondition{
 		Sort: &navmenu.FindConditionSort{
 			Weight: -1,
 		},
@@ -122,7 +123,7 @@ func (s Service) GetNavMenus(ctx context.Context, in *v1.GetNavMenusRequest) (*v
 }
 
 func (s Service) BindWithRoleIDs(ctx context.Context, in *v1.NavMenuBindWithRoleIDsRequest) (*v1.NavMenuBindWithRoleIDsReply, error) {
-	err := s.NavMenuModel.BindWithRoleIDs(ctx, in.Id, in.RoleIds)
+	err := mysql.GetNavmenu().BindWithRoleIDs(ctx, in.Id, in.RoleIds)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RolesBindFailed, err)
 	}
@@ -130,7 +131,7 @@ func (s Service) BindWithRoleIDs(ctx context.Context, in *v1.NavMenuBindWithRole
 }
 
 func (s Service) UnbindWithRoleIDs(ctx context.Context, in *v1.NavMenuUnbindWithRoleIDsRequest) (*v1.NavMenuUnbindWithRoleIDsReply, error) {
-	err := s.NavMenuModel.UnbindWithRoleIDs(ctx, in.Id, in.RoleIds)
+	err := mysql.GetNavmenu().UnbindWithRoleIDs(ctx, in.Id, in.RoleIds)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RolesUnbindFailed, err)
 	}
@@ -139,7 +140,7 @@ func (s Service) UnbindWithRoleIDs(ctx context.Context, in *v1.NavMenuUnbindWith
 
 func (s Service) GetNavMenusWithAdministratorID(ctx context.Context, in *v1.GetNavMenusWithAdministratorIDRequest) (*v1.GetNavMenusWithAdministratorIDReply, error) {
 	// 查找与administrator直接关联的role
-	roles, err := s.RoleModel.FindWithAdministrator(ctx, &role.FindWithAdministratorCondition{AdministratorID: in.AdministratorId})
+	roles, err := mysql.GetRole().FindWithAdministrator(ctx, &role.FindWithAdministratorCondition{AdministratorID: in.AdministratorId})
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +152,7 @@ func (s Service) GetNavMenusWithAdministratorID(ctx context.Context, in *v1.GetN
 
 	// 查找role的children role
 	if len(roleIDs) > 0 {
-		children, err := s.RoleModel.FindWithParentIds(ctx, roleIDs...)
+		children, err := mysql.GetRole().FindWithParentIds(ctx, roleIDs...)
 		if err != nil {
 			return nil, err
 		}
@@ -162,7 +163,7 @@ func (s Service) GetNavMenusWithAdministratorID(ctx context.Context, in *v1.GetN
 	}
 
 	// 查找navmenus
-	menus, err := s.NavMenuModel.FindWithRoleIDs(ctx, &navmenu.FindWithRoleIDsCondition{RoleIDS: roleIDs})
+	menus, err := mysql.GetNavmenu().FindWithRoleIDs(ctx, &navmenu.FindWithRoleIDsCondition{RoleIDS: roleIDs})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}

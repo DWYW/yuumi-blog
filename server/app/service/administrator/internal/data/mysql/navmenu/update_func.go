@@ -8,29 +8,20 @@ import (
 	"gorm.io/gorm"
 )
 
-func (model *Model) UpdateWithID(ctx context.Context, id int64, v interface{}) (*schema.NavMenu, error) {
-	menu := schema.NavMenu{Model: gorm.Model{ID: uint(id)}}
-
-	result := model.GetDB().WithContext(ctx).Model(&menu).Updates(v)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return model.FindOne(ctx, &FindCondition{ID: id})
-}
-
 func (model *Model) BindWithRoleIDs(ctx context.Context, id int64, roleIds []int64) error {
 	menu := schema.NavMenu{Model: gorm.Model{ID: uint(id)}}
+
 	roles := transform.TransformRolesWithIds(roleIds...)
 	tx := model.GetDB().WithContext(ctx)
-	err := tx.Model(&menu).Association(schema.Relation.Roles).Append(roles)
+	err := tx.Model(&menu).Association(model.Relations.Roles).Append(roles)
 	return err
 }
 
 func (model *Model) UnbindWithRoleIDs(ctx context.Context, id int64, roleIds []int64) error {
 	menu := schema.NavMenu{Model: gorm.Model{ID: uint(id)}}
+
 	roles := transform.TransformRolesWithIds(roleIds...)
 	tx := model.GetDB().WithContext(ctx)
-	err := tx.Model(&menu).Association(schema.Relation.Roles).Delete(roles)
+	err := tx.Model(&menu).Association(model.Relations.Roles).Delete(roles)
 	return err
 }

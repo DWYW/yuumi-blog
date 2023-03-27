@@ -23,7 +23,11 @@ type Article struct {
 	CoverUrl    string `gorm:"size:255;default:'';comment:封面图链接地址"`
 }
 
-func (Article) GetFeilds() *ArticleFields {
+func (Article) TableName() string {
+	return "articles"
+}
+
+func (Article) GetFields() *ArticleFields {
 	return &ArticleFields{
 		ID:          "id",
 		CreatedAt:   "created_at",

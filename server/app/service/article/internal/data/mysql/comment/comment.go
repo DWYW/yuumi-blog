@@ -7,17 +7,20 @@ import (
 )
 
 func New(db *gorm.DB) *Model {
+	v := schema.Comment{}
 	return &Model{
 		client:    db,
-		TableName: "comments",
-		Feilds:    schema.Comment{}.GetFeilds(),
+		TableName: v.TableName(),
+		Fields:    v.GetFields(),
+		Relations: v.GetRelations(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.CommentFields
+	Fields    *schema.CommentFields
+	Relations *schema.CommentRelations
 }
 
 func (m Model) GetDB() *gorm.DB {

@@ -2,8 +2,6 @@ package permission
 
 import (
 	v1 "yuumi/api/service/administrator/v1"
-	"yuumi/app/service/administrator/internal/data/mysql"
-	"yuumi/app/service/administrator/internal/data/mysql/permission"
 	"yuumi/pkg/logger"
 
 	grpcTransport "github.com/go-kit/kit/transport/grpc"
@@ -13,8 +11,7 @@ import (
 // 注册服务
 func RegisterServer(s *grpc.Server, log *logger.Logger) {
 	service := Service{
-		Logger:          log,
-		PermissionModel: permission.New(mysql.GetClient()),
+		Logger: log,
 	}
 	server := Server{}
 	v1.RegisterPermissionServiceServer(s, &server)

@@ -25,7 +25,11 @@ type GithubUser struct {
 	HtmlUrl   string `gorm:"size:255;default:'';comment:Github地址"`
 }
 
-func (GithubUser) GetFeilds() *GithubUserFields {
+func (GithubUser) TableName() string {
+	return "github_users"
+}
+
+func (GithubUser) GetFields() *GithubUserFields {
 	return &GithubUserFields{
 		ID:        "id",
 		CreatedAt: "created_at",

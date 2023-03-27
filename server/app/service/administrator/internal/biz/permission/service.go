@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	v1 "yuumi/api/service/administrator/v1"
+	"yuumi/app/service/administrator/internal/data/mysql"
 	"yuumi/app/service/administrator/internal/data/mysql/permission"
 	"yuumi/app/service/administrator/internal/data/mysql/schema"
 	"yuumi/app/service/administrator/internal/data/mysql/transform"
@@ -22,12 +23,11 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger          *logger.Logger
-	PermissionModel *permission.Model
+	Logger *logger.Logger
 }
 
 func (s Service) Create(ctx context.Context, in *v1.CreatePermissionRequest) (*v1.CreatePermissionReply, error) {
-	res, err := s.PermissionModel.CreateOne(ctx, &schema.Permission{Name: in.Name, RpcMethod: in.RpcMethod})
+	res, err := mysql.GetPermission().CreateOne(ctx, &schema.Permission{Name: in.Name, RpcMethod: in.RpcMethod})
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordCreationFailed)
 	}
@@ -38,7 +38,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreatePermissionRequest) (*v
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeletePermissionRequest) (*v1.DeletePermissionReply, error) {
-	_, err := s.PermissionModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetPermission().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordDeletionFailed)
 	}
@@ -46,7 +46,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeletePermissionRequest) (*v
 }
 
 func (s Service) Update(ctx context.Context, in *v1.UpdatePermissionRequest) (*v1.UpdatePermissionReply, error) {
-	fields := schema.Permission{}.GetFeilds()
+	fields := schema.Permission{}.GetFields()
 	target := map[string]interface{}{}
 	if in.Name != nil {
 		target[fields.Name] = *in.Name
@@ -55,7 +55,7 @@ func (s Service) Update(ctx context.Context, in *v1.UpdatePermissionRequest) (*v
 		target[fields.RpcMethod] = *in.RpcMethod
 	}
 
-	res, err := s.PermissionModel.UpdateWithID(ctx, in.Id, target)
+	res, err := mysql.GetPermission().UpdateWithID(ctx, in.Id, target)
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordDeletionFailed)
 	}
@@ -65,7 +65,9 @@ func (s Service) Update(ctx context.Context, in *v1.UpdatePermissionRequest) (*v
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetPermissionInfoRequest) (*v1.GetPermissionInfoReply, error) {
-	res, err := s.PermissionModel.FindOne(ctx, &permission.FindCondition{ID: in.Id, RpcMethod: in.RpcMethod})
+	res, err := mysql.GetPermission().FindOne(ctx, &permission.FindCondition{
+		Where: &permission.FindConditionWhere{ID: in.Id, RpcMethod: in.RpcMethod},
+	})
 	if err != nil {
 		return nil, errorcode.New(errorcode.RecordNotFound)
 	}
@@ -76,17 +78,18 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetPermissionInfoRequest) (
 
 func (s Service) GetList(ctx context.Context, in *v1.GetPermissionListRequest) (*v1.GetPermissionListReply, error) {
 	findCondition := &permission.FindCondition{
+		Where: &permission.FindConditionWhere{},
 		Preload: &permission.FindConditionPreload{
 			Roles: *in.PreloadRoles,
 		},
 	}
 
-	total, err := s.PermissionModel.Count(ctx, findCondition, true)
+	total, err := mysql.GetPermission().Count(ctx, findCondition.Where, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordCountFailed, err)
 	}
 
-	res, err := s.PermissionModel.FindList(ctx, &permission.FindListCondition{
+	res, err := mysql.GetPermission().FindList(ctx, &permission.FindListCondition{
 		Page:          in.Page,
 		PageSize:      in.PageSize,
 		FindCondition: findCondition,
@@ -107,7 +110,7 @@ func (s Service) GetList(ctx context.Context, in *v1.GetPermissionListRequest) (
 }
 
 func (s Service) GetPermissions(ctx context.Context, in *v1.GetPermissionsRequest) (*v1.GetPermissionsReply, error) {
-	res, err := s.PermissionModel.Find(ctx, &permission.FindCondition{})
+	res, err := mysql.GetPermission().Find(ctx, &permission.FindCondition{})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}
@@ -117,7 +120,7 @@ func (s Service) GetPermissions(ctx context.Context, in *v1.GetPermissionsReques
 }
 
 func (s Service) GetPermissionsWithRoleID(ctx context.Context, in *v1.GetPermissionsWithRoleIDRequest) (*v1.GetPermissionsWithRoleIDReply, error) {
-	res, err := s.PermissionModel.FindWithRole(ctx, &permission.FindWithRoleCondition{RoleID: in.RoleId})
+	res, err := mysql.GetPermission().FindWithRole(ctx, &permission.FindWithRoleCondition{RoleID: in.RoleId})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}

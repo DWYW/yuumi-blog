@@ -7,17 +7,20 @@ import (
 )
 
 func New(db *gorm.DB) *Model {
+	v := schema.Permission{}
 	return &Model{
 		client:    db,
-		TableName: "permissions",
-		Feilds:    schema.Permission{}.GetFeilds(),
+		TableName: v.TableName(),
+		Fields:    v.GetFields(),
+		Relations: v.GetRelations(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.PermissionFields
+	Fields    *schema.PermissionFields
+	Relations *schema.PermissionRelations
 }
 
 func (m Model) GetDB() *gorm.DB {

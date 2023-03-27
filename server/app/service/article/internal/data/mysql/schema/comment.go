@@ -26,7 +26,11 @@ type Comment struct {
 	Article   *Article
 }
 
-func (Comment) GetFeilds() *CommentFields {
+func (Comment) TableName() string {
+	return "comments"
+}
+
+func (Comment) GetFields() *CommentFields {
 	return &CommentFields{
 		ID:        "id",
 		CreatedAt: "created_at",

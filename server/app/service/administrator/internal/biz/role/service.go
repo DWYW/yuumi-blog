@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	v1 "yuumi/api/service/administrator/v1"
+	"yuumi/app/service/administrator/internal/data/mysql"
 	"yuumi/app/service/administrator/internal/data/mysql/role"
 	"yuumi/app/service/administrator/internal/data/mysql/schema"
 	"yuumi/app/service/administrator/internal/data/mysql/transform"
@@ -25,13 +26,12 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger    *logger.Logger
-	RoleModel *role.Model
+	Logger *logger.Logger
 }
 
 func (s Service) Create(ctx context.Context, in *v1.CreateRoleRequest) (*v1.CreateRoleReply, error) {
 	// 通过Name查询是否存在
-	count, err := s.RoleModel.Count(ctx, &role.FindCondition{Type: in.Type}, true)
+	count, err := mysql.GetRole().Count(ctx, &role.FindConditionWhere{Type: in.Type}, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.Unknown, err)
 	} else if count > 0 {
@@ -39,7 +39,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateRoleRequest) (*v1.Crea
 	}
 
 	// 插入文档
-	res, err := s.RoleModel.CreateOne(ctx, &schema.Role{
+	res, err := mysql.GetRole().CreateOne(ctx, &schema.Role{
 		Name:     in.Name,
 		Type:     in.Type,
 		ParentID: uint(in.ParentId),
@@ -55,7 +55,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateRoleRequest) (*v1.Crea
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeleteRoleRequest) (*v1.DeleteRoleReply, error) {
-	_, err := s.RoleModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetRole().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordDeletionFailed, err)
 	}
@@ -63,7 +63,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeleteRoleRequest) (*v1.Dele
 }
 
 func (s Service) Update(ctx context.Context, in *v1.UpdateRoleRequest) (*v1.UpdateRoleReply, error) {
-	res, err := s.RoleModel.UpdateWithID(ctx, in.Id, &schema.Role{
+	res, err := mysql.GetRole().UpdateWithID(ctx, in.Id, &schema.Role{
 		Name:     in.Name,
 		Type:     in.Type,
 		ParentID: uint(in.ParentId),
@@ -79,9 +79,11 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateRoleRequest) (*v1.Upda
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetRoleInfoRequest) (*v1.GetRoleInfoReply, error) {
-	res, err := s.RoleModel.FindOne(ctx, &role.FindCondition{
-		ID:   in.Id,
-		Type: in.Type,
+	res, err := mysql.GetRole().FindOne(ctx, &role.FindCondition{
+		Where: &role.FindConditionWhere{
+			ID:   in.Id,
+			Type: in.Type,
+		},
 		Preload: &role.FindConditionPreload{
 			Permissions: in.PreloadPermissions,
 		},
@@ -97,7 +99,7 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetRoleInfoRequest) (*v1.Ge
 }
 
 func (s Service) GetInfoWithPermissionID(ctx context.Context, in *v1.GetRoleInfoWithPermissionIDRequest) (*v1.GetRoleInfoWithPermissionIDReply, error) {
-	res, err := s.RoleModel.FindWithPermission(ctx, &role.FindWithPermissionCondition{PermissionID: in.PermissionId})
+	res, err := mysql.GetRole().FindWithPermission(ctx, &role.FindWithPermissionCondition{PermissionID: in.PermissionId})
 	if err != nil || len(res) == 0 {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
 	}
@@ -108,14 +110,16 @@ func (s Service) GetInfoWithPermissionID(ctx context.Context, in *v1.GetRoleInfo
 }
 
 func (s Service) GetList(ctx context.Context, in *v1.GetRoleListRequest) (*v1.GetRoleListReply, error) {
-	findCondition := &role.FindCondition{}
+	findCondition := &role.FindCondition{
+		Where: &role.FindConditionWhere{},
+	}
 
-	total, err := s.RoleModel.Count(ctx, findCondition, true)
+	total, err := mysql.GetRole().Count(ctx, findCondition.Where, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordCountFailed, err)
 	}
 
-	result, err := s.RoleModel.FindList(ctx, &role.FindListCondition{Page: in.Page, PageSize: in.PageSize, FindCondition: findCondition})
+	result, err := mysql.GetRole().FindList(ctx, &role.FindListCondition{Page: in.Page, PageSize: in.PageSize, FindCondition: findCondition})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}
@@ -132,7 +136,7 @@ func (s Service) GetList(ctx context.Context, in *v1.GetRoleListRequest) (*v1.Ge
 }
 
 func (s Service) GetRoles(ctx context.Context, in *v1.GetRolesRequest) (*v1.GetRolesReply, error) {
-	result, err := s.RoleModel.Find(ctx, &role.FindCondition{})
+	result, err := mysql.GetRole().Find(ctx, &role.FindCondition{})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}
@@ -143,7 +147,7 @@ func (s Service) GetRoles(ctx context.Context, in *v1.GetRolesRequest) (*v1.GetR
 }
 
 func (s Service) GetRolesWithAdministratorID(ctx context.Context, in *v1.GetRolesWithAdministratorIDRequest) (*v1.GetRolesWithAdministratorIDReply, error) {
-	roles, err := s.RoleModel.FindWithAdministrator(ctx, &role.FindWithAdministratorCondition{AdministratorID: in.AdministratorId})
+	roles, err := mysql.GetRole().FindWithAdministrator(ctx, &role.FindWithAdministratorCondition{AdministratorID: in.AdministratorId})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordsNotFound, err)
 	}
@@ -153,7 +157,7 @@ func (s Service) GetRolesWithAdministratorID(ctx context.Context, in *v1.GetRole
 	for i, role := range roles {
 		ids[i] = int64(role.ID)
 	}
-	res, err := s.RoleModel.FindWithParentIds(ctx, ids...)
+	res, err := mysql.GetRole().FindWithParentIds(ctx, ids...)
 	if err == nil {
 		roles = append(roles, res...)
 	}
@@ -164,7 +168,7 @@ func (s Service) GetRolesWithAdministratorID(ctx context.Context, in *v1.GetRole
 }
 
 func (s Service) AppendPermissionsWithRoleID(ctx context.Context, in *v1.AppendPermissionsWithRoleIDRequest) (*v1.AppendPermissionsWithRoleIDReply, error) {
-	err := s.RoleModel.AppendPermissionsWithRoleID(ctx, in.RoleId, in.PermissionIds)
+	err := mysql.GetRole().AppendPermissionsWithRoleID(ctx, in.RoleId, in.PermissionIds)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.PermissionsBindFailed, err)
 	}
@@ -175,7 +179,7 @@ func (s Service) AppendPermissionsWithRoleID(ctx context.Context, in *v1.AppendP
 }
 
 func (s Service) DeletePermissionsWithRoleID(ctx context.Context, in *v1.DeletePermissionsWithRoleIDRequest) (*v1.DeletePermissionsWithRoleIDReply, error) {
-	err := s.RoleModel.DeletePermissionsWithRoleID(ctx, in.RoleId, in.PermissionIds)
+	err := mysql.GetRole().DeletePermissionsWithRoleID(ctx, in.RoleId, in.PermissionIds)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.PermissionsUnbindFailed, err)
 	}

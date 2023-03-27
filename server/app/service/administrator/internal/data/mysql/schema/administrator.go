@@ -12,6 +12,10 @@ type AdministratorFields struct {
 	Salt      string
 }
 
+type AdministratorRelations struct {
+	Roles string
+}
+
 type Administrator struct {
 	gorm.Model
 	Name     string
@@ -20,7 +24,11 @@ type Administrator struct {
 	Roles    []*Role `gorm:"many2many:administrator_roles;"`
 }
 
-func (Administrator) GetFeilds() *AdministratorFields {
+func (Administrator) TableName() string {
+	return "administrators"
+}
+
+func (Administrator) GetFields() *AdministratorFields {
 	return &AdministratorFields{
 		ID:        "id",
 		CreatedAt: "created_at",
@@ -29,5 +37,11 @@ func (Administrator) GetFeilds() *AdministratorFields {
 		Name:      "name",
 		Password:  "password",
 		Salt:      "salt",
+	}
+}
+
+func (Administrator) GetRelations() *AdministratorRelations {
+	return &AdministratorRelations{
+		Roles: "Roles",
 	}
 }

@@ -7,17 +7,19 @@ import (
 )
 
 func New(db *gorm.DB) *Model {
+	v := schema.Article{}
+
 	return &Model{
 		client:    db,
-		TableName: "articles",
-		Feilds:    schema.Article{}.GetFeilds(),
+		TableName: v.TableName(),
+		Fields:    v.GetFields(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.ArticleFields
+	Fields    *schema.ArticleFields
 }
 
 func (m Model) GetDB() *gorm.DB {

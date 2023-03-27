@@ -10,7 +10,11 @@ type RoleNavMenu struct {
 	NavMenuID uint
 }
 
-func (RoleNavMenu) GetFeilds() *RoleNavMenuFields {
+func (RoleNavMenu) TableName() string {
+	return "role_nav_menus"
+}
+
+func (RoleNavMenu) GetFields() *RoleNavMenuFields {
 	return &RoleNavMenuFields{
 		RoleID:    "role_id",
 		NavMenuID: "nav_menu_id",

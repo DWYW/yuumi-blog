@@ -7,17 +7,20 @@ import (
 )
 
 func New(db *gorm.DB) *Model {
+	v := schema.Administrator{}
 	return &Model{
 		client:    db,
-		TableName: "administrators",
-		Feilds:    schema.Administrator{}.GetFeilds(),
+		TableName: v.TableName(),
+		Fields:    v.GetFields(),
+		Relations: v.GetRelations(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.AdministratorFields
+	Fields    *schema.AdministratorFields
+	Relations *schema.AdministratorRelations
 }
 
 func (m Model) GetDB() *gorm.DB {

@@ -10,14 +10,14 @@ func New(db *gorm.DB) *Model {
 	return &Model{
 		client:    db,
 		TableName: "github_users",
-		Feilds:    schema.GithubUser{}.GetFeilds(),
+		Fields:    schema.GithubUser{}.GetFields(),
 	}
 }
 
 type Model struct {
 	client    *gorm.DB
 	TableName string
-	Feilds    *schema.GithubUserFields
+	Fields    *schema.GithubUserFields
 }
 
 func (m Model) GetDB() *gorm.DB {

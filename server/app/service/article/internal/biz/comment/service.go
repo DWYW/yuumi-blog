@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	v1 "yuumi/api/service/article/v1"
+	"yuumi/app/service/article/internal/data/mysql"
 	"yuumi/app/service/article/internal/data/mysql/comment"
 	"yuumi/app/service/article/internal/data/mysql/schema"
 	"yuumi/app/service/article/internal/data/mysql/transform"
@@ -21,12 +22,11 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Logger       *logger.Logger
-	CommentModel *comment.Model
+	Logger *logger.Logger
 }
 
 func (s Service) Create(ctx context.Context, in *v1.CreateCommentRequest) (*v1.CreateCommentReply, error) {
-	res, err := s.CommentModel.CreateOne(ctx, &schema.Comment{
+	res, err := mysql.GetComment().CreateOne(ctx, &schema.Comment{
 		Content: in.Content,
 		Creator: &schema.Visitor{Model: gorm.Model{ID: uint(in.CreatorId)}},
 		Article: &schema.Article{Model: gorm.Model{ID: uint(in.ArticleId)}},
@@ -40,7 +40,7 @@ func (s Service) Create(ctx context.Context, in *v1.CreateCommentRequest) (*v1.C
 }
 
 func (s Service) Delete(ctx context.Context, in *v1.DeleteCommentRequest) (*v1.DeleteCommentReply, error) {
-	_, err := s.CommentModel.DeleteWithID(ctx, in.Id)
+	_, err := mysql.GetComment().DeleteWithID(ctx, in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordDeletionFailed, err)
 	}
@@ -48,7 +48,7 @@ func (s Service) Delete(ctx context.Context, in *v1.DeleteCommentRequest) (*v1.D
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetCommentInfoRequest) (*v1.GetCommentInfoReply, error) {
-	res, err := s.CommentModel.FindByID(ctx, *in.Id)
+	res, err := mysql.GetComment().FindByID(ctx, *in.Id)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
 	}
@@ -57,21 +57,23 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetCommentInfoRequest) (*v1
 
 func (s Service) GetList(ctx context.Context, in *v1.GetCommentListRequest) (*v1.GetCommentListReply, error) {
 	findCondition := &comment.FindCondition{
-		ArticleID: in.ArticleId,
-		CreatorID: in.CreatorId,
-		Sort:      &comment.FindConditionSort{ID: -1},
+		Where: &comment.FindConditionWhere{
+			ArticleID: in.ArticleId,
+			CreatorID: in.CreatorId,
+		},
+		Sort: &comment.FindConditionSort{ID: -1},
 		Preload: &comment.FindConditionPreload{
 			Creator: in.PreloadCreator,
 			Article: in.PreloadArticle,
 		},
 	}
 
-	total, err := s.CommentModel.Count(ctx, findCondition, true)
+	total, err := mysql.GetComment().Count(ctx, findCondition.Where, true)
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordCountFailed, err)
 	}
 
-	result, err := s.CommentModel.FindList(ctx, &comment.FindListCondition{
+	result, err := mysql.GetComment().FindList(ctx, &comment.FindListCondition{
 		Page:          in.Page,
 		PageSize:      in.PageSize,
 		FindCondition: findCondition,
