@@ -37,6 +37,7 @@ message UpdateArticleRequest {
   optional string keyword = 4;
   optional string content = 5;
   optional string cover_url = 6;
+  optional int64 status = 7;
 }
 message UpdateArticleReply {
   ArticleData article = 1;
@@ -44,6 +45,7 @@ message UpdateArticleReply {
 
 message GetArticleInfoRequest {
   optional int64 id = 1;
+  optional int64 status = 2;
 }
 message GetArticleInfoReply {
   ArticleData article = 1;
@@ -53,6 +55,7 @@ message GetArticleListRequest {
   int64 page = 1;
   int64 page_size = 2;
   optional string keywrod = 3;
+  optional int64 status = 4;
 }
 message GetArticleListReply {
   repeated ArticleData articles = 1;

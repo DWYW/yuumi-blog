@@ -55,16 +55,19 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.U
 		target[fields.Title] = in.Title
 	}
 	if in.Description != nil {
-		target[fields.Description] = in.Description
+		target[fields.Description] = *in.Description
 	}
 	if in.CoverUrl != nil {
-		target[fields.CoverUrl] = in.CoverUrl
+		target[fields.CoverUrl] = *in.CoverUrl
 	}
 	if in.Keyword != nil {
-		target[fields.Keyword] = in.Keyword
+		target[fields.Keyword] = *in.Keyword
 	}
 	if in.Content != nil {
-		target[fields.Content] = in.Content
+		target[fields.Content] = *in.Content
+	}
+	if in.Status != nil {
+		target[fields.Status] = *in.Status
 	}
 
 	res, err := mysql.GetArticle().UpdateWithID(ctx, in.Id, target)
@@ -76,7 +79,12 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.U
 }
 
 func (s Service) GetInfo(ctx context.Context, in *v1.GetArticleInfoRequest) (*v1.GetArticleInfoReply, error) {
-	res, err := mysql.GetArticle().FindByID(ctx, *in.Id)
+	res, err := mysql.GetArticle().FindOne(ctx, &article.FindCondition{
+		Where: &article.FindConditionWhere{
+			ID:     *in.Id,
+			Status: in.Status,
+		},
+	})
 	if err != nil {
 		return nil, errorcode.NewWithDetail(errorcode.RecordNotFound, err)
 	}
@@ -85,11 +93,11 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetArticleInfoRequest) (*v1
 
 func (s Service) GetList(ctx context.Context, in *v1.GetArticleListRequest) (*v1.GetArticleListReply, error) {
 	findCondition := &article.FindCondition{
-		Where: &article.FindConditionWhere{},
-		Sort:  &article.FindConditionSort{ID: -1},
-	}
-	if in.Keywrod != nil {
-		findCondition.Where.Keyword = *in.Keywrod
+		Where: &article.FindConditionWhere{
+			Keyword: in.Keywrod,
+			Status:  in.Status,
+		},
+		Sort: &article.FindConditionSort{ID: -1},
 	}
 
 	total, err := mysql.GetArticle().Count(ctx, findCondition.Where, true)

@@ -79,7 +79,6 @@ func (model *Model) Count(ctx context.Context, where *FindConditionWhere, exlude
 
 func (model *Model) UpdateWithID(ctx context.Context, id int64, v interface{}) (*schema.Article, error) {
 	article := schema.Article{Model: gorm.Model{ID: uint(id)}}
-
 	result := model.GetDB().WithContext(ctx).Model(&article).Updates(v)
 	if result.Error != nil {
 		return nil, result.Error

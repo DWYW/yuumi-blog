@@ -85,6 +85,7 @@ func (s Service) Update(ctx context.Context, in *v1.UpdateArticleRequest) (*v1.U
 			CoverUrl:    in.CoverUrl,
 			Content:     in.Content,
 			Keyword:     in.Keyword,
+			Status:      in.Status,
 		})
 		return err
 	}).Exec(ctx)
@@ -105,7 +106,10 @@ func (s Service) GetInfo(ctx context.Context, in *v1.GetArticleInfoRequest) (*v1
 	var reply *articleServiceV1.GetArticleInfoReply
 	err = client.Handle(func(ctx context.Context, cc grpc.ClientConnInterface) error {
 		c := articleServiceV1.NewArticleServiceClient(cc)
-		reply, err = c.GetInfo(ctx, &articleServiceV1.GetArticleInfoRequest{Id: &in.Id})
+		reply, err = c.GetInfo(ctx, &articleServiceV1.GetArticleInfoRequest{
+			Id:     &in.Id,
+			Status: in.Status,
+		})
 		return err
 	}).Exec(ctx)
 
@@ -129,6 +133,7 @@ func (s Service) GetList(ctx context.Context, in *v1.GetArticleListRequest) (*v1
 			Page:     in.Page,
 			PageSize: in.PageSize,
 			Keywrod:  in.Keyword,
+			Status:   in.Status,
 		})
 		return err
 	}).Exec(ctx)

@@ -15,6 +15,7 @@ func TransformArticleData(v *schema.Article) *v1.ArticleData {
 		Keyword:     v.Keyword,
 		Content:     v.Content,
 		CoverUrl:    v.CoverUrl,
+		Status:      v.Status,
 	}
 }
 

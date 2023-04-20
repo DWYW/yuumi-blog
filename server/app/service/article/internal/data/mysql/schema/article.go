@@ -12,6 +12,7 @@ type ArticleFields struct {
 	Keyword     string
 	Content     string
 	CoverUrl    string
+	Status      string
 }
 
 type Article struct {
@@ -21,6 +22,7 @@ type Article struct {
 	Keyword     string `gorm:"size:255;default:'';comment:文章关键词"`
 	Content     string
 	CoverUrl    string `gorm:"size:255;default:'';comment:封面图链接地址"`
+	Status      int64  `gorm:"default:0;comment:0:未发布,1:已发布"`
 }
 
 func (Article) TableName() string {
@@ -38,5 +40,6 @@ func (Article) GetFields() *ArticleFields {
 		Keyword:     "keyword",
 		Content:     "content",
 		CoverUrl:    "cover_url",
+		Status:      "status",
 	}
 }

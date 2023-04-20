@@ -15,16 +15,24 @@
         <YuumiTableColumn :title="$t('ATTR.NAME')" prop="title"></YuumiTableColumn>
         <YuumiTableColumn :title="$t('ATTR.COVER')" prop="cover_url" :width="100">
           <template #default="{$value}">
-            <img style="width: 100px;" :src="$value">
+            <div class="item-cover" :style="{backgroundImage: 'url('+$value+')'}"></div>
+          </template>
+        </YuumiTableColumn>
+        <YuumiTableColumn :title="$t('ATTR.DESCRIPTION')" prop="status" :width="200">
+          <template #default="{$value}">
+            <span :class="{ '_published': $value === '1'}">{{ statusText($value) }}</span>
           </template>
         </YuumiTableColumn>
         <YuumiTableColumn :title="$t('ATTR.DESCRIPTION')" prop="description" :width="200"></YuumiTableColumn>
         <YuumiTableColumn :title="$t('ATTR.CREATED_DATE')" prop="created_date" :width="160"></YuumiTableColumn>
         <YuumiTableColumn :title="$t('ATTR.UPDATED_DATE')" prop="updated_date" :width="160"></YuumiTableColumn>
-        <YuumiTableColumn :title="$t('ATTR.HANDLE')" fixed="right">
+        <YuumiTableColumn :title="$t('ATTR.HANDLE')" fixed="right" :width="280">
           <template #default="scope">
+            <YuumiButton v-t="'HANDLE.PREVIEW'" @click="onPreviewHandler(scope)"></YuumiButton>
             <YuumiButton theme="error" v-t="'HANDLE.DELETE'" @click="onDeleteHandler(scope)"></YuumiButton>
-            <YuumiButton theme="primary" v-t="'HANDLE.EDIT'" @click="onUpdateHandler(scope)"></YuumiButton>
+            <YuumiButton v-t="'HANDLE.EDIT'" @click="onUpdateHandler(scope)"></YuumiButton>
+            <YuumiButton v-if="articleIsPublished(scope)" theme="error" v-t="'HANDLE.UNPUBLISH'" @click="onUnpublishHandler(scope)"></YuumiButton>
+            <YuumiButton v-else v-t="'HANDLE.PUBLISH'" @click="onPublishHandler(scope)"></YuumiButton>
           </template>
         </YuumiTableColumn>
       </YuumiTable>
@@ -49,7 +57,7 @@
 import { createAlert, createMessage } from "yuumi-ui-vue"
 import { onMounted, Ref, ref } from "vue"
 import { ArticleAPI } from "@/api"
-import { $day } from "@/common"
+import { $day, $helper } from "@/common"
 import { useTableHelper } from "@/components/helper/table"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
@@ -129,7 +137,64 @@ function onUpdateHandler({ $attrs }: any) {
   const { id } = list.value[$attrs.rowIndex]
   router.push(`/system/article/detail/${id}`)
 }
+
+// 状态相关
+function statusText(status: string): string {
+  const maps = {
+    0: t("ARTICLE.UNPUBLISH"),
+    1: t("ARTICLE.PUBLISHED")
+  }
+
+  return $helper.getValueByPath<string>(maps, status, "")
+}
+
+function articleIsPublished({ $attrs }: any): boolean {
+  const { status } = list.value[$attrs.rowIndex]
+  return status === "1"
+}
+
+function onUnpublishHandler({ $attrs }: any) {
+  if (loading.value) return
+  loading.value = true
+  const { id } = list.value[$attrs.rowIndex]
+  ArticleAPI.updateWithId(id, { status: "0" }).finally(() => {
+    loading.value = false
+  }).then(() => {
+    createMessage({ message: t("MSG.UPDATED_SUCCESS"), theme: "success" })
+    tableReload()
+  })
+}
+
+function onPublishHandler({ $attrs }: any) {
+  if (loading.value) return
+  loading.value = true
+  const { id } = list.value[$attrs.rowIndex]
+  ArticleAPI.updateWithId(id, { status: "1" }).finally(() => {
+    loading.value = false
+  }).then(() => {
+    createMessage({ message: t("MSG.UPDATED_SUCCESS"), theme: "success" })
+    tableReload()
+  })
+}
+
+// 预览
+function onPreviewHandler({ $attrs }: any) {
+  const { id } = list.value[$attrs.rowIndex]
+  window.open(`${process.env.VUE_APP_SERVICE_PREVIEW}/article/${id}?preview=1`, "_blank")
+}
 </script>
 
 <style lang="scss" scoped>
+.item-cover {
+  width: 60px;
+  height: 60px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: map-get($--border-radius, "primary");
+}
+
+span._published {
+  color: map-get($--color, "success");
+}
 </style>

@@ -44,7 +44,9 @@ const route = useRoute()
 const keyword = computed(() => route.query.search || "")
 
 const { ARTICLE_API_PRIFIX } = useRuntimeConfig()
-const { data }: any = await useAsyncData(() => $fetch(`${ARTICLE_API_PRIFIX}/articles/list`, { params: { keyword: keyword.value } }))
+const listParams = computed(() => ({ keyword: keyword.value, status: "1" }))
+console.log(listParams.value)
+const { data }: any = await useAsyncData(() => $fetch(`${ARTICLE_API_PRIFIX}/articles/list`, { params: listParams.value }))
 const list = computed(() => data.value.articles.length ? [data.value.articles] : [])
 const pagination = ref(data.value.pagination)
 const showMore = computed(() => Number(pagination.value.page < pagination.value.page_total))
@@ -70,7 +72,7 @@ function computedCoverStyle(item: any) {
 
 function getMore() {
   $fetch(`${ARTICLE_API_PRIFIX}/articles/list`, { params: {
-    keyword: keyword.value,
+    ...listParams.value,
     page: Number(pagination.value.page) + 1
   }}).then((res: any) => {
     list.value.push(res.articles)

@@ -16,6 +16,7 @@ export function updateWithId(id: string, data: {
   cover_url?: string
   content?: string
   keyword?: string
+  status?: string
 }, options?: RequestOption) {
   return ArticleServer.put(`/article/${id}`, data, options)
 }

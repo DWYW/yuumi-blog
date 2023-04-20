@@ -16,6 +16,7 @@ message ArticleData {
   string keyword = 4;
   string content = 5;
   string cover_url = 6 [json_name = "cover_url"];
+  int64 status =7;
   string created_at = 50 [json_name = "created_at"];
   string updated_at = 51 [json_name = "updated_at"];
 }

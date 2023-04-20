@@ -28,7 +28,8 @@ export const ATTR = {
   COVER: "封面",
   COVER_URL: "封面链接",
   KEYWORD: "关键词",
-  CONTENT: "内容"
+  CONTENT: "内容",
+  STATUS: "状态"
 }
 
 export const HANDLE = {
@@ -37,7 +38,10 @@ export const HANDLE = {
   DELETE: "删除",
   SAVE: "保存",
   RESET: "重置",
-  CANCEL: "取消"
+  CANCEL: "取消",
+  PUBLISH: "发布",
+  UNPUBLISH: "取消发布",
+  PREVIEW: "预览"
 }
 
 export const ARTICLE = {
@@ -48,5 +52,7 @@ export const ARTICLE = {
   TITLE_REQUIRED_MSG: "请输入标题",
   DESCRIPTION_REQUIRED_MSG: "请输入简介描述",
   KEYWORD_REQUIRED_MSG: "请输入SEO关键词",
-  COVER_URL_REQUIRED_MSG: "请输入封面地址"
+  COVER_URL_REQUIRED_MSG: "请输入封面地址",
+  PUBLISHED: "已发布",
+  UNPUBLISH: "未发布"
 }

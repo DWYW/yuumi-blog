@@ -47,7 +47,8 @@ func (condition *FindCondition) Build() []func(*gorm.DB) *gorm.DB {
 
 type FindConditionWhere struct {
 	ID      int64
-	Keyword string
+	Keyword *string
+	Status  *int64
 }
 
 func (condition *FindConditionWhere) Build() []func(*gorm.DB) *gorm.DB {
@@ -60,13 +61,19 @@ func (condition *FindConditionWhere) Build() []func(*gorm.DB) *gorm.DB {
 		})
 	}
 
-	if condition.Keyword != "" {
+	if condition.Keyword != nil && *condition.Keyword != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			v := "%" + condition.Keyword + "%"
+			v := "%" + *condition.Keyword + "%"
 			tx := db.Where(fmt.Sprintf("`%s` like ?", fields.Title), v).
 				Or(fmt.Sprintf("`%s` like ?", fields.Description), v).
 				Or(fmt.Sprintf("`%s` like ?", fields.Keyword), v)
 			return db.Where(tx)
+		})
+	}
+
+	if condition.Status != nil {
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(fmt.Sprintf("`%s` = ?", fields.Status), *condition.Status)
 		})
 	}
 
