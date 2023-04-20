@@ -64,10 +64,8 @@ func (condition *FindConditionWhere) Build() []func(*gorm.DB) *gorm.DB {
 	if condition.Keyword != nil && *condition.Keyword != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			v := "%" + *condition.Keyword + "%"
-			tx := db.Where(fmt.Sprintf("`%s` like ?", fields.Title), v).
-				Or(fmt.Sprintf("`%s` like ?", fields.Description), v).
-				Or(fmt.Sprintf("`%s` like ?", fields.Keyword), v)
-			return db.Where(tx)
+			query := fmt.Sprintf("`%s` like ? OR `%s` LIKE ? OR `%s` LIKE ?", fields.Title, fields.Description, fields.Keyword)
+			return db.Where(query, v, v, v)
 		})
 	}
 
