@@ -5,10 +5,7 @@
   <div class="page-body">
     <div class="content">
       <section class="content-main">
-        <YuumiScrollbar>
-          <div class="placeholder" v-t="'ARTICLE.PLACEHOLDER_MSG'" v-if="!content"></div>
-          <div ref="mdElement" id="md" contenteditable="true" @input="onChange"></div>
-        </YuumiScrollbar>
+        <textarea id="md" v-model="content" :placeholder="$t('ARTICLE.PLACEHOLDER_MSG')"></textarea>
       </section>
       <section class="content-aside flex _col">
         <div class="content form">
@@ -73,7 +70,6 @@ const title = ref("")
 const description = ref("")
 const coverUrl = ref("")
 const keyword = ref("")
-const mdElement = ref()
 const content = ref("")
 
 onMounted(() => {
@@ -89,7 +85,6 @@ onBeforeUnmount(() => {
 })
 
 function bindShortcutKeys(e: any) {
-  console.log(e.ctrlKey, e.key)
   if (e.ctrlKey && e.key === "s") {
     onSave()
     e.preventDefault()
@@ -109,16 +104,7 @@ function getInfo() {
     coverUrl.value = article.cover_url
     content.value = article.content
     keyword.value = article.keyword
-
-    if (article.content) {
-      mdElement.value.innerText = article.content
-    }
   })
-}
-
-function onChange(e: Event) {
-  const { target }: any = e
-  content.value = target.innerText
 }
 
 function onCancel() {
@@ -184,6 +170,9 @@ function updateArticle(v: any) {
       width: 100%;
       min-height: 100%;
       outline: none;
+      resize: none;
+      border: none;
+      font-size: inherit;
     }
   }
 

@@ -27,17 +27,17 @@ buildPassportInterface:
 	mv server/app/interface/passport/bin/cmd ./dist/server/passport.interface.server
 
 buildAdminEntry:
-	mkdir -p ./dist/admin && rm -rf ./dist/client/entry
+	mkdir -p ./dist/admin && rm -rf ./dist/admin/entry
 	cd admin/entry && npm install && npm run build
 	mv admin/entry/dist ./dist/admin/entry
 
 buildAdmiAdministrator:
-	mkdir -p ./dist/admin && rm -rf ./dist/client/administrator
+	mkdir -p ./dist/admin && rm -rf ./dist/admin/administrator
 	cd admin/administrator && npm install && npm run build && npm run manifest
 	mv admin/administrator/dist ./dist/admin/administrator
 
 buildAdminArticle:
-	mkdir -p ./dist/admin && rm -rf ./dist/client/article
+	mkdir -p ./dist/admin && rm -rf ./dist/admin/article
 	cd admin/article && npm install && npm run build && npm run manifest
 	mv admin/article/dist ./dist/admin/article
 
