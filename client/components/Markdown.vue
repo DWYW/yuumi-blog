@@ -14,9 +14,10 @@ const props = defineProps({
 
 // 安全防护
 const safetyContent = computed((): string => {
+  // (?=(?:[^][^])*[^]*$)用于确保不包含 ``` 代码块的反引号字符
   return props.content
-    .replace(/<script[^>]*?\>(\s|\S)*?<\/script>/ig, "")
-    .replace(/<style[^>]*?\>(\s|\S)*?<\/style>/ig, "")
+    .replace(/(?=(?:[^`]*`[^`]*`)*[^`]*$)<script[^>]*?\>(\s|\S)*?<\/script>/ig, "")
+    .replace(/(?=(?:[^`]*`[^`]*`)*[^`]*$)<style[^>]*?\>(\s|\S)*?<\/style>/ig, "")
 })
 
 const contentHTML = computed(() => {
