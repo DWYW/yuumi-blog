@@ -7,7 +7,7 @@
       <div class="article-cover">
         <RatioRect :ratio="5/2" :style="computedCoverStyle()"></RatioRect>
       </div>
-      
+
       <div class="article-title">{{ detail.title }}</div>
       <div class="article-other">
         <span>{{ formatFromDateString(detail.created_at, "YYYY-MM-DD hh:mm:ss") }}</span>
@@ -43,10 +43,13 @@ const { data }: any = await useAsyncData(() => $fetch(`${ARTICLE_API_PRIFIX}/art
 
 const detail = ref(data.value ? data.value.article : null)
 if (detail.value) {
-  useHead({meta: [
-    { name: "keyword", content: detail.value.keyword },
-    { name: "description", content: detail.value.description },
-  ]})
+  useHead({
+    title: detail.value.title,
+    meta: [
+      { name: "keywords", content: detail.value.keyword },
+      { name: "description", content: detail.value.description }
+    ]
+  })
 }
 
 const isReady = computed(() => detail.value && (detail.value.status === "1" || route.query.preview === "1"))
@@ -120,7 +123,7 @@ article.article {
   .article-cover {
     background-color: #f5f5f5;
   }
-  
+
   .article-title {
     font-size: 32px;
     font-weight: bold;

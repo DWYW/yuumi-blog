@@ -11,8 +11,17 @@ export default defineNuxtConfig({
       charset: "utf-16",
       title: "SCOLINT‘S BLOG",
       meta: [
-        { name: "keyword", content: "blog,dwyw,scolit" },
-        { name: "description", content: "scolint's blog" }
+        { name: "keywords", content: "blog,dwyw,scolint" },
+        { name: "description", content: "scolint's blog" },
+        { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+        { name: "author", content: "scolint" },
+        // 360，优先使用解析内核
+        { name: "renderer", content: "webkit|ie-comp|ie-stand" },
+        // Google Chrome
+        // 优先使用最新的chrome版本
+        { "http-equiv": "X-UA-Compatible", content: "chrome=1" },
+        // 禁止自动翻译
+        { name: "google", content: "notranslate" }
       ]
     }
   },
