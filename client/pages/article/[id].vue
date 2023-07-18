@@ -69,6 +69,10 @@ function onPublished() {
 
 const isScrollToTop = ref(false)
 onMounted(() => {
+  useHead({
+    script: [{ src:'/js/plugin-catalogue.js',  body: true }]
+  })
+
   globalThis.onscroll = (e) => {
     const value = (globalThis.document.documentElement.scrollTop || globalThis.document.body.scrollTop) !== 0
     if (value !== isScrollToTop.value) {
