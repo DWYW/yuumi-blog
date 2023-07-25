@@ -70,15 +70,18 @@ function onPublished() {
 const isScrollToTop = ref(false)
 onMounted(() => {
   useHead({
-    script: [{ src:'/js/plugin-catalogue.js',  body: true }]
+    script: [
+      { src:'/js/plugin-catalogue.js',  body: true },
+      { src:'/js/plugin-scroll2top.js',  body: true }
+    ]
   })
 
-  globalThis.onscroll = (e) => {
+  globalThis.addEventListener("scroll", (e) => {
     const value = (globalThis.document.documentElement.scrollTop || globalThis.document.body.scrollTop) !== 0
     if (value !== isScrollToTop.value) {
       isScrollToTop.value = value
     }
-  }
+  })
 })
 </script>
 
