@@ -67,21 +67,32 @@ function onPublished() {
   listStamp.value = new Date().toString()
 }
 
+function onScroll () {
+  const value = (window.document.documentElement.scrollTop || window.document.body.scrollTop) !== 0
+  if (value !== isScrollToTop.value) {
+    isScrollToTop.value = value
+  }
+}
+
 const isScrollToTop = ref(false)
+
 onMounted(() => {
   useHead({
     script: [
       { src:'/js/plugin-catalogue.js',  body: true },
-      { src:'/js/plugin-scroll2top.js',  body: true }
+      { src:'/js/plugin-scroll2top.js',  body: true,  }
     ]
   })
 
-  globalThis.addEventListener("scroll", (e) => {
-    const value = (globalThis.document.documentElement.scrollTop || globalThis.document.body.scrollTop) !== 0
-    if (value !== isScrollToTop.value) {
-      isScrollToTop.value = value
-    }
-  })
+  window.addEventListener("scroll", onScroll, false)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", onScroll, false)
+
+  if (window.__scroll2top) {
+    window.__scroll2top.destroy()
+  }
 })
 </script>
 

@@ -52,14 +52,20 @@ const list = computed(() => data.value.articles.length ? [data.value.articles] :
 const pagination = ref(data.value.pagination)
 const showMore = computed(() => Number(pagination.value.page < pagination.value.page_total))
 
+function onScroll () {
+  const value = (window.document.documentElement.scrollTop || window.document.body.scrollTop) !== 0
+  if (value !== isScrollToTop.value) {
+    isScrollToTop.value = value
+  }
+}
+
 const isScrollToTop = ref(false)
 onMounted(() => {
-  globalThis.onscroll = (e) => {
-    const value = (globalThis.document.documentElement.scrollTop || globalThis.document.body.scrollTop) !== 0
-    if (value !== isScrollToTop.value) {
-      isScrollToTop.value = value
-    }
-  }
+  window.addEventListener("scroll", onScroll, false)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", onScroll, false)
 })
 
 function computedCoverStyle(item: any) {

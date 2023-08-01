@@ -1,17 +1,27 @@
-(function(options){
-  options = Object.assign({
-    threshold: 300,
-    size: "48px",
-    right: "16px",
-    bottom: "84px",
-    borderRadius: "8px",
-    borderColor: "#cccccc",
-    background: "rgba(255, 255, 255, .6)",
-    fontSize: "12px",
-    text: "顶部"
-  }, options)
+(function (global) {
+  function Scroll2Top(options) {
+    this.options = Object.assign({
+      threshold: 300,
+      size: "48px",
+      right: "16px",
+      bottom: "84px",
+      borderRadius: "8px",
+      borderColor: "#cccccc",
+      background: "rgba(255, 255, 255, .6)",
+      fontSize: "12px",
+      text: "顶部"
+    }, options)
 
-  function styles2string(styles) {
+
+    this.$el = this.createBtn()
+    this.onScroll = this.scrollEvent.bind(this)
+    this.onClick = this.clickEvent.bind(this)
+    document.body.appendChild(this.$el)
+    window.addEventListener("scroll", this.onScroll, false)
+    this.$el.addEventListener("click", this.onClick, false)
+  }
+
+  Scroll2Top.prototype.styles2string = function (styles) {
     var str = ""
     for (var key in styles) {
       str += key.replace(/([A-Z])/g, "-$1").toLowerCase() + ":" + styles[key] + ";"
@@ -19,13 +29,13 @@
     return str
   }
 
-  function createBtn() {
+  Scroll2Top.prototype.createBtn = function () {
     var arrow = document.createElement("div")
-    arrow.setAttribute("style", styles2string({
+    arrow.setAttribute("style", this.styles2string({
       width: "30%",
       paddingTop: "30%",
-      borderTop: "1px solid " + options.borderColor,
-      borderLeft: "1px solid " + options.borderColor,
+      borderTop: "1px solid " + this.options.borderColor,
+      borderLeft: "1px solid " + this.options.borderColor,
       transform: "rotate(45deg)",
       transformOrigin: "top left",
       position: "absolute",
@@ -34,20 +44,20 @@
     }))
 
     var text = document.createElement("p")
-    text.innerText = options.text
+    text.innerText = this.options.text
 
     var btn = document.createElement("div")
-    btn.setAttribute("style", styles2string({
+    btn.setAttribute("style", this.styles2string({
       position: "fixed",
-      right: options.right,
-      bottom: options.bottom,
-      border: "1px solid " + options.borderColor,
-      borderRadius: options.borderRadius,
-      width: options.size,
-      height: options.size,
-      background: options.background,
+      right: this.options.right,
+      bottom: this.options.bottom,
+      border: "1px solid " + this.options.borderColor,
+      borderRadius: this.options.borderRadius,
+      width: this.options.size,
+      height: this.options.size,
+      background: this.options.background,
       cursor: "pointer",
-      fontSize: options.fontSize,
+      fontSize: this.options.fontSize,
       textAlign: "center",
       paddingTop: "24px",
       display: "none"
@@ -58,63 +68,65 @@
     return btn
   }
 
-  function mounte(element) {
-    document.body.appendChild(element)
+  Scroll2Top.prototype.isVisible = false
+  Scroll2Top.prototype.showBtn = function () {
+    if (this.isVisible) return
+    this.isVisible = true
+    this.$el.style.setProperty("display", "block")
+
+    setTimeout(function () {
+      this.$el.style.setProperty("opacity", "1")
+      this.$el.style.setProperty("transition", "opacity 0.3s ease")
+    }.bind(this), 16)
   }
 
-  function bindEvents(element) {
-    var direction = ""
-    var prevScrollTop = 0
-    var timeout = null
+  Scroll2Top.prototype.hideBtn = function () {
+    if (!this.isVisible) return
+    this.isVisible = false
+    this.$el.style.setProperty("opacity", "0")
 
-    window.addEventListener("scroll", function() {
-      if (timeout !== null) {
-        clearTimeout(timeout)
-      }
-
-      timeout = setTimeout(function() {
-        var scrollTop = window.document.documentElement.scrollTop || window.document.body.scrollTop
-        direction = scrollTop > prevScrollTop ? "down" : "top"
-        prevScrollTop = scrollTop
-        timeout = null
-        direction === "down" && scrollTop > options.threshold && showBtn(element)
-        direction === "top" && scrollTop < options.threshold && hideBtn(element)
-      }, 100)
-    })
-
-    element.addEventListener("click", function() {
-      document.body.scroll({ top: 0, behavior: "smooth" })
-      document.documentElement.scroll({ top: 0, behavior: "smooth" })
-    })
+    setTimeout(function () {
+      this.$el.style.setProperty("display", "none")
+      this.$el.style.removeProperty("opacity")
+      this.$el.style.removeProperty("transition")
+    }.bind(this), 300)
   }
 
+  Scroll2Top.prototype.direction = ""
+  Scroll2Top.prototype.prevScrollTop = 0
+  Scroll2Top.prototype.timeout = null
 
-  var isVisible = false
+  Scroll2Top.prototype.scrollEvent = function () {
+    if (this.timeout !== null) {
+      clearTimeout(this.timeout)
+    }
 
-  function showBtn(element) {
-    if (isVisible) return
-    isVisible = true
-    element.style.setProperty("display", "block")
-
-    setTimeout(function() {
-      element.style.setProperty("opacity", "1")
-      element.style.setProperty("transition", "opacity 0.3s ease")
-    }, 16)
+    this.timeout = setTimeout(function () {
+      var scrollTop = window.document.documentElement.scrollTop || window.document.body.scrollTop
+      this.direction = scrollTop > this.prevScrollTop ? "down" : "top"
+      this.prevScrollTop = scrollTop
+      this.timeout = null
+      this.direction === "down" && scrollTop > this.options.threshold && this.showBtn()
+      this.direction === "top" && scrollTop < this.options.threshold && this.hideBtn()
+    }.bind(this), 100)
   }
 
-  function hideBtn(element) {
-    if (!isVisible) return
-    isVisible = false
-    element.style.setProperty("opacity", "0")
-
-    setTimeout(function() {
-      element.style.setProperty("display", "none")
-      element.style.removeProperty("opacity")
-      element.style.removeProperty("transition")
-    }, 300)
+  Scroll2Top.prototype.clickEvent = function () {
+    document.body.scroll({ top: 0, behavior: "smooth" })
+    document.documentElement.scroll({ top: 0, behavior: "smooth" })
   }
 
-  var btnElement = createBtn()
-  mounte(btnElement)
-  bindEvents(btnElement)
-})();
+  Scroll2Top.prototype.destroy = function() {
+    var ins = global.__scroll2top
+    window.removeEventListener("scroll", ins.onScroll, false)
+    document.body.removeChild(ins.$el)
+
+    if (global.__scroll2top) {
+      delete global.__scroll2top
+    }
+  }
+
+  if (!global.__scroll2top) {
+    global.__scroll2top = new Scroll2Top()
+  }
+})(window, {});
